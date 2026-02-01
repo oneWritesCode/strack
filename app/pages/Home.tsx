@@ -10,16 +10,7 @@ import Link from "next/link";
 import { useTheme } from "../context/ThemeContext";
 import classnames from "classnames";
 
-interface Card {
-  id: string;
-  title: string;
-}
-
-const DEFAULT_CARDS: Card[] = [
-  { id: "gym", title: "Gym" },
-  { id: "poems", title: "Poems" },
-  { id: "quotes", title: "Quotes" },
-];
+import { DEFAULT_CARDS, type Card } from "../lib/constants";
 
 function Home() {
   const [cards, setCards] = useState<Card[]>([]);
@@ -28,6 +19,7 @@ function Home() {
   const { data: session } = useSession();
   const [optimisticName, setOptimisticName] = useState<string | null>(null);
   const { theme, setTheme, availableThemes } = useTheme();
+  const [previews, setPreviews] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const savedName = Cookies.get("sk_user_name");
@@ -36,12 +28,56 @@ function Home() {
 
   useEffect(() => {
     const savedCards = localStorage.getItem("skilltracker_cards");
-    if (savedCards) {
-      setCards(JSON.parse(savedCards));
-    } else {
-      setCards(DEFAULT_CARDS);
-    }
+    const loadedCards = savedCards ? JSON.parse(savedCards) : DEFAULT_CARDS;
+    setCards(loadedCards);
+
+    // Load previews for all cards
+    const newPreviews: Record<string, string> = {};
+    loadedCards.forEach((card: Card) => {
+      // Priority 1: Use card.content directly if it exists (now saved as plain text)
+      if (card.content) {
+        newPreviews[card.id] =
+          card.content.slice(0, 80).trim() +
+          (card.content.length > 80 ? "..." : "");
+      } else {
+        // Fallback: Try to extract from saved JSON data if card.content is missing
+        const savedData = localStorage.getItem(`extra_card_${card.id}`);
+        if (savedData) {
+          try {
+            const { content } = JSON.parse(savedData);
+            newPreviews[card.id] = extractTextFromContent(content);
+          } catch (e) {
+            console.error("Error parsing card data", e);
+          }
+        }
+      }
+    });
+    setPreviews(newPreviews);
   }, []);
+
+  const extractTextFromContent = (content: any): string => {
+    if (!content) return "";
+
+    let text = "";
+    if (typeof content === "string") {
+      // It's HTML, strip tags
+      text = content.replace(/<[^>]*>/g, " ");
+    } else if (content.content) {
+      // It's Tiptap JSON
+      const getText = (nodes: any[]): string => {
+        return nodes
+          .map((node) => {
+            if (node.type === "text") return node.text;
+            if (node.content) return getText(node.content);
+            return "";
+          })
+          .join(" ");
+      };
+      text = getText(content.content);
+    }
+
+    return text.replace(/\s+/g, " ").slice(0, 80).trim() + "...";
+  };
 
   const saveCards = (updatedCards: Card[]) => {
     setCards(updatedCards);
@@ -112,20 +148,32 @@ function Home() {
             {cards.map((card) => (
               <Link
                 key={card.id}
-                href={`/extra/${card.id}`}
+                href={`/notes/${card.id}`}
                 className={classnames(
-                  "group w-24 md:min-w-75 relative h-20 md:h-32 bg-(--red-background) border-2 border-(--text-color) rounded-xl md:rounded-3xl p-6 transition-all duration-400 flex items-center justify-center cursor-pointer",
+                  "group min-w-[60vw] md:min-w-75 relative h-24 md:h-40 bg-(--red-background) border-2 border-(--text-color) rounded-xl md:rounded-3xl p-2 md:p-6 transition-all duration-400 flex flex-col items-start cursor-pointer",
                   "shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-x-1 hover:translate-y-1",
-                  { "text-black bg-transparent shadow-black" :theme ==="yellow"},
+                  {
+                    "text-black bg-transparent shadow-black":
+                      theme === "yellow",
+                  },
                   {
                     "shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] md:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)]":
                       theme === "black",
                   },
                 )}
               >
-                <h3 className="md:text-3xl font-bold text-black uppercase tracking-wider text-center">
+                <h3 className="text-xl md:text-3xl font-bold text-black uppercase tracking-wider">
                   {card.title}
                 </h3>
+                {previews[card.id] ? (
+                  <p className="text-xs md:text-sm text-black/60 font-semibold line-clamp-2">
+                    {previews[card.id]}
+                  </p>
+                ) : (
+                  <p className="text-xs md:text-sm text-black/60 font-semibold line-clamp-2">
+                    write something in {card.title}
+                  </p>
+                )}
               </Link>
             ))}
 
@@ -133,7 +181,7 @@ function Home() {
             <button
               onClick={() => setIsAdding(true)}
               className={classnames(
-                "relative min-w-24 md:min-w-75 h-20 md:h-32 bg-(--text-color) text-(--background-color) rounded-2xl md:rounded-3xl flex items-center justify-center border-2 border-(--background-color)/40 transition-all duration-300 cursor-pointer",
+                "relative min-w-40 md:min-w-75 h-24 md:h-40 bg-(--text-color) text-(--background-color) rounded-2xl md:rounded-3xl flex items-center justify-center border-2 border-(--background-color)/40 transition-all duration-300 cursor-pointer",
                 "shadow-[6px_6px_0px_0px_rgba(0,0,0,0.1)] md:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1",
               )}
             >

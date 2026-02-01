@@ -122,7 +122,9 @@ export default function Navbar() {
                       ? "/images/alternateUserImageWhite.png"
                       : theme === "violet"
                         ? "/images/alternateUserImageBlack.png"
-                        : "/images/alternateUserImage.png"
+                        : theme === "rose"
+                          ? "/images/alternateUserImageGirl.png"
+                          : "/images/alternateUserImage.png"
                   }
                   alt="User"
                   className="w-full h-full object-cover"

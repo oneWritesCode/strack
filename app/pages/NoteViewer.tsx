@@ -14,19 +14,14 @@ import classnames from "classnames";
 import { useTheme } from "../context/ThemeContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { DEFAULT_CARDS } from "../lib/constants";
 
-type tasksDoneType = {
-  title: string;
-  completed: boolean;
-};
-
-interface CardDetailProps {
+interface NoteViewerProps {
   id: string;
 }
 
-export default function CardDetail({ id }: CardDetailProps) {
+export default function NoteViewer({ id }: NoteViewerProps) {
   const router = useRouter();
-  const [tasksDone, setTasksDone] = useState<tasksDoneType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [cardTitle, setCardTitle] = useState("");
@@ -100,38 +95,89 @@ export default function CardDetail({ id }: CardDetailProps) {
   });
 
   useEffect(() => {
-    // Get title from cards list
-    const savedCards = localStorage.getItem("skilltracker_cards");
-    if (savedCards) {
-      const cards = JSON.parse(savedCards);
-      const currentCard = cards.find((c: any) => c.id === id);
-      if (currentCard) setCardTitle(currentCard.title);
-    }
+    // 1. Load card title from local cards list or fallback to DEFAULT_CARDS
+    const savedCardsString = localStorage.getItem("skilltracker_cards");
+    let cardTitleFromList = "";
+    let defaultContentFromCard = "";
 
-    // Load content
-    const savedData = localStorage.getItem(storageKey);
-    if (savedData && editor) {
-      try {
-        const { content, tasks } = JSON.parse(savedData);
-        if (content) editor.commands.setContent(content);
-        if (tasks) setTasksDone(tasks);
-      } catch (e) {
-        console.error("Error loading from localStorage", e);
+    if (savedCardsString) {
+      const cards = JSON.parse(savedCardsString);
+      const currentCard = cards.find((c: any) => c.id === id);
+      if (currentCard) {
+        cardTitleFromList = currentCard.title;
+        // Prioritize contentHTML if it exists
+        defaultContentFromCard =
+          currentCard.contentHTML || currentCard.content || "";
       }
     }
-  }, [id, editor, storageKey]);
+
+    // If not found in localStorage cards, check DEFAULT_CARDS
+    if (!cardTitleFromList) {
+      const defaultCard = DEFAULT_CARDS.find((c) => c.id === id);
+      if (defaultCard) {
+        cardTitleFromList = defaultCard.title;
+        defaultContentFromCard =
+          defaultCard.contentHTML || defaultCard.content || "";
+      }
+    }
+
+    setCardTitle(cardTitleFromList);
+
+    // 2. Load editor content
+    if (editor) {
+      // Priority 1: Specific saved content for this note
+      const savedNoteData = localStorage.getItem(storageKey);
+      if (savedNoteData) {
+        try {
+          const { content } = JSON.parse(savedNoteData);
+          if (content) {
+            editor.commands.setContent(content);
+            return;
+          }
+        } catch (e) {
+          console.error("Error loading note content from localStorage", e);
+        }
+      }
+
+      if (defaultContentFromCard) {
+        editor.commands.setContent(defaultContentFromCard);
+      } else {
+        editor.commands.setContent(defaultContent);
+      }
+    }
+  }, [id, editor, storageKey, defaultContent]);
 
   const saveToLocalStorage = () => {
     if (!editor) return;
     setIsLoading(true);
-    const content = editor.getJSON();
+
+    const contentJSON = editor.getJSON();
+    const contentHTML = editor.getHTML();
+    const contentText = editor.getText(); // Plain text for previews
+
+    // Update specific note data
     const data = {
-      content,
-      tasks: tasksDone,
+      content: contentJSON,
       lastUpdated: new Date().toISOString(),
     };
-
     localStorage.setItem(storageKey, JSON.stringify(data));
+
+    // Update the card in the main cards list for previews
+    const savedCardsString = localStorage.getItem("skilltracker_cards");
+    if (savedCardsString) {
+      const cards = JSON.parse(savedCardsString);
+      const updatedCards = cards.map((card: any) => {
+        if (card.id === id) {
+          return {
+            ...card,
+            content: contentText, // Plain text for Home page
+            contentHTML: contentHTML, // HTML for subsequent loads
+          };
+        }
+        return card;
+      });
+      localStorage.setItem("skilltracker_cards", JSON.stringify(updatedCards));
+    }
 
     setTimeout(() => {
       setIsLoading(false);
@@ -186,7 +232,6 @@ export default function CardDetail({ id }: CardDetailProps) {
           >
             Highlight
           </button>
-          
 
           {/* More Menu */}
           <div className="relative" ref={menuRef}>
