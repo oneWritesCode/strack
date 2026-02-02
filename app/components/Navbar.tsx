@@ -152,7 +152,7 @@ export default function Navbar() {
                 home
               </button>
             </Link>
-            <Link
+            {/* <Link
               href="/day"
               onClick={() => setIsOpen(false)}
               className={getLinkClasses("/day")}
@@ -160,7 +160,7 @@ export default function Navbar() {
               <button className="w-full py-2 px-4 rounded-xl transition-all text-sm font-bold cursor-pointer">
                 Your Day
               </button>
-            </Link>
+            </Link> */}
 
             <Link
               href="/profile"
