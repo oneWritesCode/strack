@@ -1,6 +1,6 @@
 "use client";
 
-import { Color, TextStyle } from "@tiptap/extension-text-style";
+import { TextStyle } from "@tiptap/extension-text-style";
 import { useEditor } from "@tiptap/react";
 import { EditorContent } from "@tiptap/react";
 import Heading from "@tiptap/extension-heading";
@@ -10,41 +10,14 @@ import { FontSize } from "@/app/extensions/FontSize";
 import Image from "@tiptap/extension-image";
 import { Redo, Undo } from "lucide-react";
 
-type Editor = {
-
-}
-
 export default function Editor() {
-  // const [isSaved, setIsSaved] = useState(false)
-  // const [popUpText, setPopUpText] = useState();
-
-  // const savingWriting = () => {
-  //     if (!editor) return
-  //     const content = editor.getJSON()
-  //     localStorage.setItem("editorContent", JSON.stringify(content))
-  //     setPopUpText(<> <span className='text-green-400 text-xs '><Check size={18} /> </span>we saved your writing, now go and touch some grass</>)
-  //     showPopUp()
-  // }
-  // const clearingWriting = () => {
-  //     localStorage.removeItem("editorContent")
-  //     setPopUpText(<> <span className='text-red-400 text-xs '><Check size={18} /> </span>we cleared your shit now write some text</>)
-  //     showPopUp()
-  // }
-
-  // function showPopUp() {
-  //     setIsSaved(true);
-  //     setTimeout(() => {
-  //         setIsSaved(false)
-  //     }, 2000)
-  // }
-
   const defaultContent = `
         <strong>You Can Write There About Your Day</strong>
         <br />
         <br />
     `;
 
-  const editor: Editor | any = useEditor({
+  const editor: any = useEditor({
     extensions: [
       StarterKit.configure({
         heading: false,
@@ -54,7 +27,6 @@ export default function Editor() {
         allowBase64: true,
       }),
       TextStyle,
-    //   Color,
       Highlight,
       FontSize,
       Heading.configure({
@@ -62,10 +34,6 @@ export default function Editor() {
       }),
     ],
     content: defaultContent,
-    // content: (() => {
-    //     const savedContent = localStorage.getItem("editorContent")
-    //     return savedContent ? JSON.parse(savedContent) : defaultContent;
-    // })(),
 
     editorProps: {
       handlePaste(view, event) {
@@ -176,40 +144,8 @@ export default function Editor() {
               </option>
             ))}
           </select>
-
-          {/* change text color */}
-          {/* <input
-            type="color"
-            onInput={(e) =>
-              editor.chain().focus().setColor(e.target.value).run()
-            }
-            className="h-7 w-7 text-sm cursor-pointer hover:bg-[var(--light-background)] border-white/50 "
-          /> */}
         </div>
-
-        {/* <div className='inline-flex items-center hover:bg-red-700 font-bold hover:text-white transition-all justify-center rounded-xl bg-[var(--light-background)] gap-1 ml-3'>
-                    undo button 
-                    <button
-                        onClick={clearingWriting}
-                        className='capitalize text-xs flex items-center px-3 py-1 justify-center rounded-full cursor-pointer'
-                    >
-                        clear storage
-                    </button>
-                </div> */}
       </div>
-
-      {/* <div className='fixed bottom-[12vh] w-full flex items-center justify-center'>
-                <button
-                    className='bg-[var(--light-background)] absolute right-[7vw] px-4 py-2 flex items-center justify-center gap-2 rounded-xl font-bold cursor-pointer hover:bg-black transition'
-                    onClick={savingWriting}
-                >
-                    Save writing <span className='text-gray-300'> <CloudCheck /></span>
-                </button>
-            </div> */}
-
-      {/* <div className='fixed top-[15vh] w-full flex items-center justify-center'>
-                <div className={`bg-[var(--light-background)] absolute right-[4vw] px-3 py-2 flex items-center text-xs justify-center gap-2 rounded-xl font-medium transition-all duration-1000 z-1000 capitalize ${isSaved ? "translate-x-[0vw]" : "translate-x-[100vw]"}`}>{popUpText}</div>
-            </div> */}
 
       <div className="max-w-4x  w-full flex items-start justify-center px-10 pt-20">
         <div

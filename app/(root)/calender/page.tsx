@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import LoginPage from "../../components/LoginPage";
 import { useSession } from "next-auth/react";
 import Cookies from "js-cookie";
-import Soon from "@/app/components/Soon";
+import Calender from "@/app/pages/Calender";
 
 export default function LoginButton() {
   const { data: session } = useSession();
@@ -20,12 +20,12 @@ export default function LoginButton() {
   }, []);
 
   if (isChecking) {
-    return null; // Or a loading spinner
+    return null;
   }
 
   if (!session && !hasCookie) {
     return <LoginPage />;
   }
 
-  return <Soon />;
+  return <Calender />;
 }

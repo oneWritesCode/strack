@@ -152,16 +152,7 @@ export default function Navbar() {
                 home
               </button>
             </Link>
-            {/* <Link
-              href="/day"
-              onClick={() => setIsOpen(false)}
-              className={getLinkClasses("/day")}
-            >
-              <button className="w-full py-2 px-4 rounded-xl transition-all text-sm font-bold cursor-pointer">
-                Your Day
-              </button>
-            </Link> */}
-
+           
             <Link
               href="/profile"
               onClick={() => setIsOpen(false)}

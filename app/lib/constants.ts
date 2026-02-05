@@ -37,15 +37,4 @@ export const DEFAULT_CARDS: Card[] = [
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
     `,
   },
-  // {
-  //   id: "quotes",
-  //   title: "Quotes",
-  //   content: "write your thought of the day",
-  //   contentHTML: `
-  //      <strong>Write about qoutes here</strong>
-  //      <br />
-  //      <br />
-  //      - &nbsp; write your thought of the day
-  //   `,
-  // },
 ];

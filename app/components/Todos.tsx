@@ -137,37 +137,6 @@ export default function skills() {
           )}
         </div>
       </div>
-      {/* <div className="flex justify-end">
-        {showInput ? (
-          <div className="fixed top-0 left-0 w-full h-screen flex flex-col md:flex-row justify-center items-center gap-4 backdrop-blur-xl bg-white/2 z-1000 p-4">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              className="rounded-md border border-gray-400 py-1"
-            />
-            <button
-              onClick={addSkill}
-              className="bg-blue-600 hover:bg-blue-700 cursor-pointer rounded px-3 py-1 text-sm md:text-base md:px-4 uppercase font-bold"
-            >
-              Save
-            </button>
-            <button
-              onClick={() => setShowInput(false)}
-              className="bg-blue-600 hover:bg-blue-700 cursor-pointer rounded px-3 py-1 text-sm md:text-base md:px-4 uppercase font-bold"
-            >
-              cancel
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowInput(true)}
-            className="bg-blue-600 hover:bg-blue-700 cursor-pointer rounded px-3 py-1 text-sm md:text-base md:px-4 uppercase font-bold"
-          >
-            Add
-          </button>
-        )}
-      </div> */}
     </div>
   );
 }
