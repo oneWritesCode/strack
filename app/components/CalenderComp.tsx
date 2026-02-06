@@ -118,13 +118,13 @@ const CalenderComp = () => {
       id: 1,
       title: "Real World UX | Learn User Experience & Start Your Career",
       icon: <BookOpen className="w-5 h-5 text-blue-500" />,
-      bgColor: "bg-[#E6F4F1]",
+      bgColor: "bg-white/10",
     },
     {
       id: 2,
       title: "User Experience (UX): The Ultimate Guide to Usability and UX",
       icon: <Layout className="w-5 h-5 text-teal-500" />,
-      bgColor: "bg-[#E0F2F2]",
+      bgColor: "bg-white/10",
     },
   ];
 
@@ -151,25 +151,17 @@ const CalenderComp = () => {
     return "testing"; // Default
   };
   return (
-    <div className="flex flex-col lg:flex-row gap-8 w-full p-6 bg-[#F8FAFB] mx-auto">
-      <div className="top-0 left-0 fixed p-8 bg-black">
-        {" "}
-        <Navbar />
-      </div>
+    <div className="flex flex-col lg:flex-row gap-8 w-full min-h-screen py-4 px-6 bg-(--background-color) mx-auto font-bubblegum">
+      <Navbar />
       {/* Left Section: Events */}
       <div className="flex-1 flex flex-col gap-6">
-        <div className="flex justify-between items-center px-2">
-          <h2 className="text-2xl font-bold text-gray-800">
+        <div className="flex justify-end items-center gap-1 md:gap-4 mt-14 md:mt-24 lg:mt-0">
+          <h2 className="text-2xl font-bold text-(--text-color)">
             {selectedDay
               ? `Events for ${monthNames[month]} ${selectedDay}`
               : "Upcoming Events"}
           </h2>
-          {loading && (
-            <div className="text-sm text-gray-500 animate-pulse">
-              Loading events...
-            </div>
-          )}
-          <CalendarIcon className="w-6 h-6 text-gray-400" />
+          <CalendarIcon className="w-6 h-6 text-(--text-color)/40" />
         </div>
 
         <div className="flex flex-col gap-4">
@@ -189,24 +181,24 @@ const CalenderComp = () => {
               return (
                 <div
                   key={event.id}
-                  className="bg-white p-6 rounded-[2rem] shadow-sm flex flex-col gap-3 hover:translate-y-[-4px] transition-all cursor-pointer border border-gray-50"
+                  className="bg-(--red-background) p-6 rounded-[2rem] shadow-sm flex flex-col gap-3 hover:translate-y-[-4px] transition-all cursor-pointer"
                 >
                   <div className="flex justify-between items-center">
                     <span
                       className={classNames(
                         "px-3 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wider",
                         {
-                          "bg-blue-100 text-blue-600": category === "workshop",
-                          "bg-purple-100 text-purple-600":
+                          "bg-blue-200 text-blue-800": category === "workshop",
+                          "bg-purple-200 text-purple-800":
                             category === "meeting",
-                          "bg-orange-100 text-orange-600": category === "lab",
-                          "bg-green-100 text-green-600": category === "testing",
+                          "bg-orange-200 text-orange-800": category === "lab",
+                          "bg-green-200 text-green-800": category === "testing",
                         },
                       )}
                     >
                       {category}
                     </span>
-                    <div className="flex items-center gap-1 text-gray-400 text-xs font-medium">
+                    <div className="flex items-center gap-1 text-black/40 text-xs font-medium">
                       <Clock className="w-3 h-3" />
                       {new Date(event.start).toLocaleTimeString([], {
                         hour: "2-digit",
@@ -214,20 +206,25 @@ const CalenderComp = () => {
                       })}
                     </div>
                   </div>
-                  <h4 className="text-lg font-bold text-gray-800">
+                  <h4 className="text-lg font-bold text-black uppercase tracking-wider">
                     {event.title}
                   </h4>
                 </div>
               );
             })
           ) : (
-            <div className="bg-white p-12 rounded-[2rem] shadow-sm flex flex-col items-center justify-center text-center gap-2 border border-dashed border-gray-200">
-              <CalendarIcon className="w-8 h-8 text-gray-300" />
-              <p className="text-gray-500 font-medium">
+            <div className="bg-(--red-background)/0 p-12 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2">
+              <CalendarIcon className="w-8 h-8 text-(--text-color)/20" />
+              <p className="text-(--text-color)/60 font-medium">
                 {session
                   ? "No events scheduled for this day"
                   : "Sign in to see your events"}
               </p>
+              {loading && (
+                <div className="text-sm text-(--text-color)/60 animate-pulse">
+                  Loading events...
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -235,28 +232,28 @@ const CalenderComp = () => {
 
       {/* Right Section: Calendar & Lessons */}
       <div className="w-full lg:w-[400px] flex flex-col gap-6">
-        <h2 className="text-2xl font-bold px-2 text-gray-800">
+        <h2 className="text-2xl font-bold px-2 text-(--text-color)">
           Lesson schedule
         </h2>
 
-        <div className="bg-white rounded-[2.5rem] p-8 shadow-sm">
+        <div className="bg-white/10 rounded-[1.5rem] p-8 shadow-sm ">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-gray-800">
+            <h3 className="text-xl font-bold text-(--text-color) uppercase">
               {monthNames[month]} {year}
             </h3>
             <div className="flex gap-2">
               <button
                 onClick={prevMonth}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-1 hover:bg-black/5 rounded-full transition-colors"
               >
-                <ChevronLeft className="w-5 h-5 text-gray-400" />
+                <ChevronLeft className="w-5 h-5 text-(--text-color)/40" />
               </button>
               <button
                 onClick={nextMonth}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-1 hover:bg-black/5 rounded-full transition-colors"
               >
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-(--text-color)/40" />
               </button>
             </div>
           </div>
@@ -266,7 +263,7 @@ const CalenderComp = () => {
             {weekDays.map((day) => (
               <div
                 key={day}
-                className="text-center text-[0.65rem] font-bold text-gray-400"
+                className="text-center text-[0.65rem] font-bold text-(--text-color)/40"
               >
                 {day}
               </div>
@@ -299,12 +296,12 @@ const CalenderComp = () => {
                     className={classNames(
                       "w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium transition-all cursor-pointer relative",
                       {
-                        "bg-black text-white shadow-md": isSelected,
-                        "bg-[#D9EBEB] text-gray-800":
-                          isHighlighted && !isSelected,
-                        "text-gray-400 border-[1.5px] border-dashed border-gray-200":
+                        "bg-(--text-color) text-(--background-color) shadow-md":
+                          isSelected,
+                        "bg-black/10 text-black": isHighlighted && !isSelected,
+                        "text-(--text-color)/20 border-[1.5px] border-dashed border-black/10":
                           isOutside,
-                        "text-gray-800 hover:bg-gray-50":
+                        "text-(--text-color) hover:bg-(--text-color)/5":
                           !isSelected && !isHighlighted && !isOutside,
                       },
                     )}
@@ -315,8 +312,8 @@ const CalenderComp = () => {
                   {isHighlighted && !isOutside && (
                     <div
                       className={classNames("w-1 h-1 rounded-full", {
-                        "bg-black": isSelected,
-                        "bg-teal-500": !isSelected,
+                        "bg-(--background-color)": isSelected,
+                        "bg-black/40": !isSelected,
                       })}
                     />
                   )}
@@ -332,14 +329,14 @@ const CalenderComp = () => {
             <div
               key={lesson.id}
               className={classNames(
-                "p-4 rounded-[1.5rem] flex items-start gap-4 cursor-pointer hover:opacity-90 transition-opacity",
+                "p-4 rounded-[1rem] flex items-start gap-4 cursor-pointer hover:opacity-90 transition-opacity border border-(--text-color)/10",
                 lesson.bgColor,
               )}
             >
-              <div className="bg-white p-2 rounded-xl shadow-sm">
+              <div className="bg-white/5 p-2 rounded-xl shadow-sm">
                 {lesson.icon}
               </div>
-              <p className="text-sm font-semibold text-gray-800 leading-tight">
+              <p className="text-sm font-semibold text-(--text-color)/80 leading-tight uppercase">
                 {lesson.title}
               </p>
             </div>
