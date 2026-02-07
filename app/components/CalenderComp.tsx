@@ -113,21 +113,6 @@ const CalenderComp = () => {
 
   const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-  const lessons = [
-    {
-      id: 1,
-      title: "Real World UX | Learn User Experience & Start Your Career",
-      icon: <BookOpen className="w-5 h-5 text-blue-500" />,
-      bgColor: "bg-white/10",
-    },
-    {
-      id: 2,
-      title: "User Experience (UX): The Ultimate Guide to Usability and UX",
-      icon: <Layout className="w-5 h-5 text-teal-500" />,
-      bgColor: "bg-white/10",
-    },
-  ];
-
   const filteredEvents = selectedDay
     ? events.filter((e) => {
         const eventDate = new Date(e.start);
@@ -298,7 +283,8 @@ const CalenderComp = () => {
                       {
                         "bg-(--text-color) text-(--background-color) shadow-md":
                           isSelected,
-                        "bg-black/10 text-black": isHighlighted && !isSelected,
+                        "bg-(--text-color)/10 text-(--text-color)":
+                          isHighlighted && !isSelected,
                         "text-(--text-color)/20 border-[1.5px] border-dashed border-black/10":
                           isOutside,
                         "text-(--text-color) hover:bg-(--text-color)/5":
@@ -323,25 +309,7 @@ const CalenderComp = () => {
           </div>
         </div>
 
-        {/* Lessons Section */}
-        <div className="flex flex-col gap-3">
-          {lessons.map((lesson) => (
-            <div
-              key={lesson.id}
-              className={classNames(
-                "p-4 rounded-[1rem] flex items-start gap-4 cursor-pointer hover:opacity-90 transition-opacity border border-(--text-color)/10",
-                lesson.bgColor,
-              )}
-            >
-              <div className="bg-white/5 p-2 rounded-xl shadow-sm">
-                {lesson.icon}
-              </div>
-              <p className="text-sm font-semibold text-(--text-color)/80 leading-tight uppercase">
-                {lesson.title}
-              </p>
-            </div>
-          ))}
-        </div>
+        <div className="bg-(--text-color) py-2 text-(--background-color) rounded-xl flex justify-center items-center text-2xl font-bold cursor-pointer">Add Event +</div>
       </div>
     </div>
   );
