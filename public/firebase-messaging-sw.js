@@ -2,11 +2,11 @@ importScripts("https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"
 importScripts("https://www.gstatic.com/firebasejs/10.0.0/firebase-messaging-compat.js")
 
 firebase.initializeApp({
-    apiKey: "AIzaSyDaCRh8yZlK1PCELMb6Z6ZW6aM3AyHbLng",
-    authDomain: "skilltracker-e3c7e.firebaseapp.com",
-    projectId: "skilltracker-e3c7e",
-    messagingSenderId: "48920378777",
-    appId: "1:48920378777:web:7bc0b0b9053868569d2708",
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSANGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 })
 
 const messaging = firebase.messaging()
