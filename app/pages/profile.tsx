@@ -93,8 +93,9 @@ function Landing() {
             <p className="text-sm font-black uppercase">
               Created by{" "}
               <Link
-                href="d33pak.space"
+                href="https://d33pak.space"
                 className="text-(--light-background) underline"
+                target="_blank"
               >
                 Deepak
               </Link>{" "}

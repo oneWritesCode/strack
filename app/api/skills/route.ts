@@ -16,13 +16,23 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(skills);
+  const tasks = await prisma.task.findMany({
+    where: {
+      completed: true,
+      journal: {
+        userId: session.user.id,
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return NextResponse.json({ skills, tasks });
 }
 
 // ADD a skill
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
-  
+
   if (!session?.user?.id) {
     return NextResponse.json([], { status: 401 });
   }

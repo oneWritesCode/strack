@@ -9,15 +9,28 @@ type setSkillsType = {
   skillName: string;
   id: string;
 };
+type TaskType = {
+  id: string;
+  title: string;
+  completed: boolean;
+  createdAt: string;
+};
+
 type SkillsFromBackendType = {
   id: string;
-  skillName: String;
+  skillName: string;
   userId: string;
   createdAt: string;
 };
 
+type ApiResponse = {
+  skills: SkillsFromBackendType[];
+  tasks: TaskType[];
+};
+
 export default function skills() {
   const [skills, setSkills] = useState<setSkillsType[]>([]);
+  const [tasks, setTasks] = useState<TaskType[]>([]);
   const [showInput, setShowInput] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const { theme } = useTheme();
@@ -25,14 +38,15 @@ export default function skills() {
 
   const fetchedSkills = async () => {
     const res = await fetch("/api/skills");
-    const data = await res.json();
-    // console.log("here you go with the data", data);
+    const data: ApiResponse = await res.json();
+    console.log("here you go with the data", data);
     setSkills(
-      data.map((skill: SkillsFromBackendType) => ({
+      data.skills.map((skill: SkillsFromBackendType) => ({
         skillName: skill.skillName,
         id: skill.id,
       })),
     );
+    setTasks(data.tasks);
   };
 
   async function deleteSkill(id: any) {
@@ -80,11 +94,13 @@ export default function skills() {
 
   return (
     <div
-      className={`w-full my-3  capitalize font-medium text-sm text-(--text-color)`}
+      className={`w-full my-3 capitalize font-medium text-sm text-(--text-color)`}
     >
-      skills you are learning:
+      <div className="flex justify-between items-center mb-1">
+        <span>skills you are learning:</span>
+      </div>
       <div>
-        <div className="mt-3 flex gap-2 md:gap-4 flex-wrap">
+        <div className="mt-2 flex gap-2 md:gap-4 flex-wrap">
           {skills.map((skill) => (
             <span
               key={skill.id}
@@ -115,12 +131,14 @@ export default function skills() {
                 className="w-32 ring-2 ring-(--text-color)/50 shadow-sm shadow-(--text-color)/20 rounded-xl px-2 py-0.5 outline-none bg-transparent text-(--text-color) text-sm m-1"
               />
               <button
+                type="button"
                 onClick={addSkill}
                 className="bg-(--text-color) text-(--background-color) rounded-xl px-3 py-0.5 uppercase cursor-pointer text-sm font-bold transition-colors"
               >
                 Save
               </button>
               <button
+                type="button"
                 onClick={() => setShowInput(false)}
                 className="p-0.5 rounded-full text-(--text-color) transition-colors cursor-pointer hover:bg-(--text-color) hover:text-(--background-color)"
               >
