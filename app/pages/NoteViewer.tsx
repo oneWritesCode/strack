@@ -57,7 +57,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
        <strong>Write about ${id} here</strong>
        <br />
        <br />
-       - &nbsp; Start tracking your progress...
+       - Start Writing <br /> <br />  <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
     `;
 
   const editor: any = useEditor({
