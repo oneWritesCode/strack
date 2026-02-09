@@ -6,9 +6,7 @@ import Loading from "./components/Loading";
 import NotificationPermission from "./components/NotificationPermission";
 // import Footer from "./components/Footer";
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/firebase-messaging-sw.js");
-}
+// Service worker registration moved to NotificationPermission.tsx
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",

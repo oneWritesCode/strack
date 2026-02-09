@@ -13,12 +13,31 @@ export default function NotificationPermission() {
       typeof window !== "undefined" &&
       "serviceWorker" in navigator
     ) {
-      const requestPermission = async () => {
+      const registerServiceWorker = async () => {
+        try {
+          const registration = await navigator.serviceWorker.register(
+            "/api/firebase-messaging-sw",
+          );
+          console.log(
+            "Service Worker registered with scope:",
+            registration.scope,
+          );
+          return registration;
+        } catch (error) {
+          console.error("Service Worker registration failed:", error);
+          return null;
+        }
+      };
+
+      const requestPermission = async (
+        registration: ServiceWorkerRegistration,
+      ) => {
         try {
           const permission = await Notification.requestPermission();
           if (permission === "granted") {
             const token = await getToken(messaging!, {
               vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+              serviceWorkerRegistration: registration,
             });
 
             if (token) {
@@ -36,7 +55,14 @@ export default function NotificationPermission() {
         }
       };
 
-      requestPermission();
+      const registerAndRequest = async () => {
+        const registration = await registerServiceWorker();
+        if (registration) {
+          await requestPermission(registration);
+        }
+      };
+
+      registerAndRequest();
     }
   }, [session]);
 
