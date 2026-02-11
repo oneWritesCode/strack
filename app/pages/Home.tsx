@@ -140,37 +140,37 @@ function Home() {
             how's your day?
           </p>
         </div>
+        
+        <div className="flex gap-4 relative w-full pb-8 pr-10 border-b-2 border-b-(--text-color)/25">
+          <DailyTodoList />
+          <Link
+            href="/day"
+            className={classnames(
+              "group w-[50vw] md:w-70 relative h-25 md:h-30 border-2 border-(--text-color) rounded-2xl md:rounded-3xl p-3 md:p-4 transition-all duration-400 flex flex-col items-start cursor-pointer",
+              "shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-x-1 hover:translate-y-1",
+              {
+                "text-black bg-transparent shadow-black": theme === "yellow",
+              },
+              {
+                "shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] md:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)]":
+                  theme === "black",
+              },
+            )}
+          >
+            <h3 className="text-xl md:text-3xl font-bold text-(--text-color) uppercase tracking-wider">
+              Today{" "}
+            </h3>
+
+            <p className="text-xs md:text-sm text-(--text-color)/60 font-semibold line-clamp-2">
+              how's Your day? write something about it or what you have done
+              today...
+            </p>
+          </Link>
+        </div>
 
         {/* Cards Carousel Container */}
         <div className="relative w-full">
           <div className="absolute right-0 top-0 min-w-15 md:min-w-25 h-full bg-gradient-to-l from-(--background-color) via-(--background-color)/60 to-transparent z-10 pointer-events-none"></div>
-
-          <div className="flex gap-4 relative w-full pb-8 pr-10 border-b-2 border-b-(--text-color)/25">
-            <DailyTodoList />
-            <Link
-              href="/day"
-              className={classnames(
-                "group w-[50vw] md:w-70 relative h-20 md:h-30 border-2 border-(--text-color) rounded-xl md:rounded-3xl p-2 md:p-4 transition-all duration-400 flex flex-col items-start cursor-pointer",
-                "shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-x-1 hover:translate-y-1",
-                {
-                  "text-black bg-transparent shadow-black": theme === "yellow",
-                },
-                {
-                  "shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] md:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)]":
-                    theme === "black",
-                },
-              )}
-            >
-              <h3 className="text-xl md:text-3xl font-bold text-(--text-color) uppercase tracking-wider">
-                Today{" "}
-              </h3>
-
-              <p className="text-xs md:text-sm text-(--text-color)/60 font-semibold line-clamp-2">
-                how's Your day? write something about it or what you have done
-                today...
-              </p>
-            </Link>
-          </div>
 
           <div className="flex relative gap-4 md:gap-6 w-full pb-4 md:pb-8 pr-10 pt-4 md:pt-6 overflow-x-auto overflow-y-hidden scrollbar-hide">
             {cards.map((card) => (

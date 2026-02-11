@@ -264,7 +264,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
         <div className="editorContent min-h-[50vh] prose prose-sm md:prose-lg max-w-none border-t-2 border-black/10 pt-6 text-(--text-color)">
           <EditorContent
             editor={editor}
-            className="outline-none border-none cursor-text"
+            className="outline-none border-none cursor-text text-lg"
           />
         </div>
 
