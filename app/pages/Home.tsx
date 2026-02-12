@@ -62,10 +62,8 @@ const NoteCard = ({
       >
         <Star
           size={isList ? 20 : 24}
-          className={classnames("transition-all", {
+          className={classnames("transition-all text-black", {
             "fill-yellow-400 text-black drop-shadow-sm": card.isStarred,
-            "text-black hover:text-black":
-              !card.isStarred && theme !== "black"
           })}
         />
       </button>
