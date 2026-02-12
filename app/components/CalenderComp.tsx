@@ -136,17 +136,17 @@ const CalenderComp = () => {
     return "testing"; // Default
   };
   return (
-    <div className="flex flex-col lg:flex-row gap-8 w-full min-h-screen py-4 px-6 bg-(--background-color) mx-auto font-bubblegum">
+    <div className="flex flex-col-reverse  lg:flex-row gap-8 w-full min-h-screen py-4 px-6 bg-(--background-color) mx-auto font-bubblegum">
       <Navbar />
       {/* Left Section: Events */}
       <div className="flex-1 flex flex-col gap-6">
-        <div className="flex justify-end items-center gap-1 md:gap-4 mt-14 md:mt-24 lg:mt-0">
-          <h2 className="text-2xl font-bold text-(--text-color)">
+        <div className="flex justify-between md:justify-end items-center gap-2 md:gap-4 md:mt-24 lg:mt-0">
+          <h2 className="text-lg md:text-2xl font-bold text-(--text-color)">
             {selectedDay
               ? `Events for ${monthNames[month]} ${selectedDay}`
               : "Upcoming Events"}
           </h2>
-          <CalendarIcon className="w-6 h-6 text-(--text-color)/40" />
+          <CalendarIcon className="w-5 h-5 md:w-6 md:h-6 text-(--text-color)/40" />
         </div>
 
         <div className="flex flex-col gap-4">
@@ -162,28 +162,16 @@ const CalenderComp = () => {
             </div>
           ) : filteredEvents.length > 0 ? (
             filteredEvents.map((event) => {
-              const category = getEventCategory(event.title);
               return (
                 <div
                   key={event.id}
-                  className="bg-(--red-background) p-6 rounded-[2rem] shadow-sm flex flex-col gap-3 hover:translate-y-[-4px] transition-all cursor-pointer"
+                  className="bg-(--red-background) p-4 md:p-6 rounded-3xl md:rounded-[2rem] shadow-sm flex flex-col gap-3 hover:translate-y-[-4px] transition-all cursor-pointer"
                 >
-                  <div className="flex justify-between items-center">
-                    <span
-                      className={classNames(
-                        "px-3 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wider",
-                        {
-                          "bg-blue-200 text-blue-800": category === "workshop",
-                          "bg-purple-200 text-purple-800":
-                            category === "meeting",
-                          "bg-orange-200 text-orange-800": category === "lab",
-                          "bg-green-200 text-green-800": category === "testing",
-                        },
-                      )}
-                    >
-                      {category}
-                    </span>
-                    <div className="flex items-center gap-1 text-black/40 text-xs font-medium">
+                  <div className="flex justify-between items-start  ">
+                   <h4 className="text-xs md:text-lg font-bold text-black uppercase tracking-wider">
+                    {event.title}
+                  </h4>
+                    <div className="flex items-center gap-1 whitespace-nowrap text-black/40 text-xs font-medium">
                       <Clock className="w-3 h-3" />
                       {new Date(event.start).toLocaleTimeString([], {
                         hour: "2-digit",
@@ -191,15 +179,13 @@ const CalenderComp = () => {
                       })}
                     </div>
                   </div>
-                  <h4 className="text-lg font-bold text-black uppercase tracking-wider">
-                    {event.title}
-                  </h4>
+                  
                 </div>
               );
             })
           ) : (
             <div className="bg-(--red-background)/0 p-12 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2">
-              <CalendarIcon className="w-8 h-8 text-(--text-color)/20" />
+              <CalendarIcon className="w-5 h-5 md:w-8 md:h-8 text-(--text-color)/20" />
               <p className="text-(--text-color)/60 font-medium">
                 {session
                   ? "No events scheduled for this day"
@@ -216,15 +202,15 @@ const CalenderComp = () => {
       </div>
 
       {/* Right Section: Calendar & Lessons */}
-      <div className="w-full lg:w-[400px] flex flex-col gap-6">
-        <h2 className="text-2xl font-bold px-2 text-(--text-color)">
+      <div className="w-full lg:w-[400px] flex flex-col gap-2 md:gap-6 mt-10 md:mt-0">
+        <h2 className="text-2xl font-bold md:px-2 text-(--text-color)">
           Lesson schedule
         </h2>
 
-        <div className="bg-white/10 rounded-[1.5rem] p-8 shadow-sm ">
+        <div className="bg-white/10 rounded-[1.5rem] p-4 md:p-8 shadow-sm ">
           {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-(--text-color) uppercase">
+          <div className="flex justify-between items-center mb-4 md:mb-6">
+            <h3 className="text-sm md:text-xl font-bold text-(--text-color) uppercase">
               {monthNames[month]} {year}
             </h3>
             <div className="flex gap-2">
@@ -244,7 +230,7 @@ const CalenderComp = () => {
           </div>
 
           {/* Weekdays */}
-          <div className="grid grid-cols-7 mb-4">
+          <div className="grid grid-cols-7 mb-2 md:mb-4">
             {weekDays.map((day) => (
               <div
                 key={day}
@@ -279,7 +265,7 @@ const CalenderComp = () => {
                   <div
                     onClick={() => d.current && setSelectedDay(d.day)}
                     className={classNames(
-                      "w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium transition-all cursor-pointer relative",
+                      "w-6 h-6 md:w-9 md:h-9 flex items-center justify-center rounded-full text-sm font-medium transition-all cursor-pointer relative",
                       {
                         "bg-(--text-color) text-(--background-color) shadow-md":
                           isSelected,
@@ -309,7 +295,7 @@ const CalenderComp = () => {
           </div>
         </div>
 
-        <div className="bg-(--text-color) py-2 text-(--background-color) rounded-xl flex justify-center items-center text-2xl font-bold cursor-pointer">Add Event +</div>
+        {/* <div className="bg-(--text-color) py-2 text-(--background-color) rounded-xl flex justify-center items-center text-2xl font-bold cursor-pointer">Add Event +</div> */}
       </div>
     </div>
   );
