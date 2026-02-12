@@ -65,9 +65,7 @@ const NoteCard = ({
           className={classnames("transition-all", {
             "fill-yellow-400 text-black drop-shadow-sm": card.isStarred,
             "text-black hover:text-black":
-              !card.isStarred && theme !== "black",
-            "text-black hover:text-black":
-              !card.isStarred && theme === "black",
+              !card.isStarred && theme !== "black"
           })}
         />
       </button>
