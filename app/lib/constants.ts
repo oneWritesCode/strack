@@ -3,6 +3,8 @@ export interface Card {
   title: string;
   content?: string; // Plain text for previews
   contentHTML?: string; // HTML for the editor
+  category?: string;
+  isStarred?: boolean;
 }
 
 export const DEFAULT_CARDS: Card[] = [
@@ -27,8 +29,7 @@ export const DEFAULT_CARDS: Card[] = [
   {
     id: "poems",
     title: "Poems",
-    content:
-      "write something beautiful you listened today",
+    content: "write something beautiful you listened today",
     contentHTML: `
     For as long as              <br/>
     i exists,                   <br/>

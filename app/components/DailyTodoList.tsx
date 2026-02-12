@@ -35,7 +35,7 @@ export default function DailyTodoList() {
               content: [
                 {
                   type: "paragraph",
-                  content: [{ type: "text", text: "Today's journal..." }],
+                  content: [{ type: "text", text: "you write nothing about your day yet!!" }],
                 },
               ],
             }),
@@ -94,7 +94,7 @@ export default function DailyTodoList() {
     >
       <div
         className={classnames(
-          "relative transition-all duration-500 ease-in-out border-2 border-(--text-color) rounded-2xl md:rounded-3xl p-3 md:p-4 overflow-hidden",
+          "relative transition-all duration-500 ease-in-out border-2 border-(--text-color) rounded-3xl p-3 md:p-4 overflow-hidden",
           "w-[50vw] md:w-70",
           "shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-x-1 hover:translate-y-1",
           {
