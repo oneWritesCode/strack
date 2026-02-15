@@ -94,6 +94,7 @@ export default function Navbar() {
           {
             "translate-x-0": isOpen,
             "-translate-x-full": !isOpen,
+            "bg-black": theme === "black",
           },
         )}
       >
@@ -146,17 +147,37 @@ export default function Navbar() {
             <Link
               href="/"
               onClick={() => setIsOpen(false)}
-              className={getLinkClasses("/")}
+              className={classname(
+                "flex items-center gap-3 rounded-xl transition-all cursor-pointer border-2",
+                {
+                  "bg-(--light-background) text-(--background-color) border-(--light-background)":
+                    pathname === "/",
+                  "bg-white text-black border-white":
+                    pathname === "/" && theme === "black",
+                  "text-(--text-color) border-(--text-color) hover:border-(--light-background) hover:bg-(--light-background) hover:text-(--background-color)":
+                    pathname !== "/",
+                },
+              )}
             >
               <button className="w-full py-2 px-4 rounded-xl transition-all text-sm font-bold cursor-pointer">
                 home
               </button>
             </Link>
-           
+
             <Link
               href="/profile"
               onClick={() => setIsOpen(false)}
-              className={getLinkClasses("/profile")}
+              className={classname(
+                "flex items-center gap-3 rounded-xl transition-all cursor-pointer border-2",
+                {
+                  "bg-(--light-background) text-(--background-color) border-(--light-background)":
+                    pathname === "/profile",
+                  "bg-white text-black border-white":
+                    pathname === "/profile" && theme === "black",
+                  "text-(--text-color) border-(--text-color) hover:border-(--light-background) hover:bg-(--light-background) hover:text-(--background-color)":
+                    pathname !== "/profile",
+                },
+              )}
             >
               <button className="w-full py-2 px-4 rounded-xl transition-all text-sm font-bold cursor-pointer">
                 View Profile

@@ -169,6 +169,17 @@ function Home() {
     const loadedCards = savedCards ? JSON.parse(savedCards) : DEFAULT_CARDS;
     setCards(loadedCards);
 
+    // Load saved layout
+    const savedLayout = localStorage.getItem("skilltracker_layout");
+    if (
+      savedLayout &&
+      (savedLayout === "carousel" ||
+        savedLayout === "grid" ||
+        savedLayout === "list")
+    ) {
+      setLayout(savedLayout);
+    }
+
     // Load previews for all cards
     const newPreviews: Record<string, string> = {};
     loadedCards.forEach((card: Card) => {
@@ -266,9 +277,13 @@ function Home() {
   });
 
   const toggleLayout = () => {
-    if (layout === "carousel") setLayout("grid");
-    else if (layout === "grid") setLayout("list");
-    else setLayout("carousel");
+    let nextLayout: "carousel" | "grid" | "list";
+    if (layout === "carousel") nextLayout = "grid";
+    else if (layout === "grid") nextLayout = "list";
+    else nextLayout = "carousel";
+
+    setLayout(nextLayout);
+    localStorage.setItem("skilltracker_layout", nextLayout);
   };
 
   const getLayoutIcon = () => {
