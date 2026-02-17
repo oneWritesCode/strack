@@ -35,7 +35,12 @@ export default function DailyTodoList() {
               content: [
                 {
                   type: "paragraph",
-                  content: [{ type: "text", text: "you write nothing about your day yet!!" }],
+                  content: [
+                    {
+                      type: "text",
+                      text: "you write nothing about your day yet!!",
+                    },
+                  ],
                 },
               ],
             }),
@@ -98,7 +103,7 @@ export default function DailyTodoList() {
           "w-[50vw] md:w-70",
           "shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-x-1 hover:translate-y-1",
           {
-            "min-h-auto md:w-70 bg-black ": isExpanded,
+            "min-h-auto md:w-70": isExpanded,
             "min-h-50 max-h-100": !isExpanded,
             "bg-(--red-background)": theme !== "yellow" || "black",
             "bg-transparent text-white": theme === "black",
@@ -109,7 +114,9 @@ export default function DailyTodoList() {
         )}
       >
         <div className="flex justify-between items-start mb-1">
-          <div className={` ${tasks.length > 0 ? "flex items-center gap-2":""} overflow-hidden`}>
+          <div
+            className={` ${tasks.length > 0 ? "flex items-center gap-2" : ""} overflow-hidden`}
+          >
             <h3 className="text-xl md:text-3xl font-bold uppercase tracking-wider">
               Tasks
             </h3>
@@ -139,8 +146,8 @@ export default function DailyTodoList() {
           className={classnames(
             "flex flex-col gap-2 transition-all duration-300",
             {
-              "max-h-60 overflow-y-auto pr-1 scrollbar-hide": isExpanded,
-              "max-h-24 overflow-hidden": !isExpanded,
+              "overflow-y-auto pr-1": isExpanded,
+              "overflow-hidden": !isExpanded,
             },
           )}
         >
@@ -148,12 +155,12 @@ export default function DailyTodoList() {
             {tasks.map((task, idx) => (
               <li key={idx} className="flex items-center gap-2 group">
                 <button
-                  onClick={() => toggleTask(idx)}
+                  onClick={() => toggleTask(idx)} 
                   className={classnames(
                     "flex-1 flex items-center gap-2 p-1 rounded-lg transition-all text-left",
                     {
-                      "borer text-(--text-color)/40": task.completed,
-                      "boder text-(--text-color) hover:bg-black/10":
+                      "text-(--text-color)/40": task.completed,
+                      "text-(--text-color) hover:bg-black/10":
                         !task.completed,
                       "": !isExpanded,
                     },
@@ -162,7 +169,6 @@ export default function DailyTodoList() {
                   <div
                     className={classnames(
                       "w-4 h-4 md:w-4 md:h-4 rounded-md border-2 border-(--text-color)/60 flex items-center justify-center transition-all",
-                      { "bg-black": task.completed },
                     )}
                   >
                     {task.completed && (

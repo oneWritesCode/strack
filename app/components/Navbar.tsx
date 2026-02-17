@@ -154,7 +154,7 @@ export default function Navbar() {
                     pathname === "/",
                   "bg-white text-black border-white":
                     pathname === "/" && theme === "black",
-                  "text-(--text-color) border-(--text-color) hover:border-(--light-background) hover:bg-(--light-background) hover:text-(--background-color)":
+                  "text-(--text-color) border-(--text-color) hover:bg-white hover:text-black hover:border-white":
                     pathname !== "/",
                 },
               )}
@@ -174,7 +174,7 @@ export default function Navbar() {
                     pathname === "/profile",
                   "bg-white text-black border-white":
                     pathname === "/profile" && theme === "black",
-                  "text-(--text-color) border-(--text-color) hover:border-(--light-background) hover:bg-(--light-background) hover:text-(--background-color)":
+                  "text-(--text-color) border-(--text-color) hover:border-white hover:bg-white hover:text-black":
                     pathname !== "/profile",
                 },
               )}

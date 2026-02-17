@@ -92,7 +92,22 @@ export default function NoteViewer({ id }: NoteViewerProps) {
       },
     },
     immediatelyRender: false,
+    onUpdate: ({ editor }) => {
+      setLastUpdateTrigger(Date.now());
+    },
   });
+
+  const [lastUpdateTrigger, setLastUpdateTrigger] = useState(0);
+
+  useEffect(() => {
+    if (lastUpdateTrigger === 0 || !editor) return;
+
+    const timer = setTimeout(() => {
+      saveToLocalStorage();
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [lastUpdateTrigger]);
 
   useEffect(() => {
     // 1. Load card title from local cards list or fallback to DEFAULT_CARDS
@@ -216,19 +231,19 @@ export default function NoteViewer({ id }: NoteViewerProps) {
           <div className="h-6 w-px bg-(--text-color)/20 mx-1" />
           <button
             onClick={() => editor?.chain().focus().toggleBold().run()}
-            className="px-2 font-bold hover:text-(--light-background)"
+            className="px-2 font-bold hover:scale-105 cursor-pointer hover:bg-white/10 rounded-full transition-all"
           >
             B
           </button>
           <button
             onClick={() => editor?.chain().focus().toggleItalic().run()}
-            className="px-2 italic hover:text-(--light-background)"
+            className="px-2 italic hover:scale-105 cursor-pointer hover:bg-white/10 rounded-full transition-all"
           >
             I
           </button>
           <button
             onClick={() => editor?.chain().focus().toggleHighlight().run()}
-            className="px-2 hover:text-(--light-background)"
+            className="px-2 hover:scale-105 cursor-pointer hover:bg-white/10 rounded-full transition-all"
           >
             Highlight
           </button>
@@ -273,7 +288,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
             onClick={saveToLocalStorage}
             disabled={isLoading}
             className={classnames(
-              "px-8 py-3 rounded-full font-bold uppercase transition-all flex items-center gap-2",
+              "px-3 py-1 md:px-5 md:py-2 rounded-full font-bold uppercase transition-all flex items-center gap-2",
               "bg-(--text-color) text-(--background-color) border-2 border-(--text-color)",
               "shadow-[6px_6px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-none hover:translate-x-1 hover:translate-y-1",
               {

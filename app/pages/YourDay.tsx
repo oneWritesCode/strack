@@ -36,6 +36,7 @@ export default function Editor() {
       - &nbsp; "How are you really feeling?"
        <br />
       - &nbsp; "What's been on your mind?" 
+      <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
     `;
 
   const editor: Editor | any = useEditor({
@@ -334,11 +335,6 @@ export default function Editor() {
         </div>
 
         <div className="w-full flex justify-start items-end mt-4 relative">
-          {/* {showSuccess && (
-            <div className="absolute right-0 bottom-full mb-2 text-white px-3 py-1 rounded-md text-sm font-medium animate-in fade-in slide-in-from-bottom-2">
-              Submitted!
-            </div>
-          )} */}
           <button
             onClick={SaveToDb}
             disabled={isLoading}
@@ -346,6 +342,17 @@ export default function Editor() {
           >
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             {isLoading ? "Saving..." : showSuccess ? "Submitted!" : "submit"}
+          </button>
+
+          <button
+            onClick={() => {
+              editor?.commands.clearContent();
+              editor?.commands.focus();
+            }}
+            disabled={isLoading}
+            className="ml-2 px-6 py-2 rounded-3xl font-bold capitalize bg-(--text-color) text-(--background-color) cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 mb-4"
+          >
+            clear
           </button>
         </div>
       </div>

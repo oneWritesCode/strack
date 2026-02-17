@@ -64,7 +64,10 @@ export default function skills() {
     fetchedSkills();
   }, []);
 
-  const saveSkillInDB = async () => {
+  const saveSkillInDB = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue.trim()) return;
+
     const res = await fetch("api/skills", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -81,16 +84,20 @@ export default function skills() {
       { skillName: saved.skillName, id: saved.id },
       ...prev,
     ]);
-  };
-
-  const addSkill = () => {
-    if (!inputValue.trim()) return;
-
-    saveSkillInDB();
 
     setInputValue("");
     setShowInput(false);
   };
+
+  // const addSkill = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (!inputValue.trim()) return;
+
+  //   saveSkillInDB();
+
+  //   setInputValue("");
+  //   setShowInput(false);
+  // };
 
   return (
     <div
@@ -123,7 +130,7 @@ export default function skills() {
             </span>
           ))}
           {showInput ? (
-            <form className="flex items-center gap-2">
+            <form onSubmit={saveSkillInDB} className="flex items-center gap-2">
               <input
                 type="text"
                 value={inputValue}
@@ -132,7 +139,7 @@ export default function skills() {
               />
               <button
                 type="button"
-                onClick={addSkill}
+                onClick={saveSkillInDB}
                 className="bg-(--text-color) text-(--background-color) rounded-xl px-3 py-0.5 uppercase cursor-pointer text-sm font-bold transition-colors"
               >
                 Save

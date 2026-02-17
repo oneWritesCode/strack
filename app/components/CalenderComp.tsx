@@ -4,27 +4,51 @@ import { useState, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
-  BookOpen,
-  Layout,
   Calendar as CalendarIcon,
-  Clock,
+  ArrowLeft,
 } from "lucide-react";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
-import Navbar from "./Navbar";
+import Link from "next/link";
+import { useTheme } from "../context/ThemeContext";
+
+type setSkillsType = {
+  skillName: string;
+  id: string;
+};
+type TaskType = {
+  id: string;
+  title: string;
+  completed: boolean;
+  createdAt: any;
+};
+type SkillsFromBackendType = {
+  id: string;
+  skillName: string;
+  userId: string;
+  createdAt: any;
+};
+
+type ApiResponse = {
+  skills: SkillsFromBackendType[];
+  tasks: TaskType[];
+};
 
 const CalenderComp = () => {
+  const { theme } = useTheme();
   const { data: session } = useSession();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<number | null>(
     new Date().getDate(),
   );
   const [events, setEvents] = useState<any[]>([]);
+  const [skills, setSkills] = useState<setSkillsType[]>([]);
+  const [tasks, setTasks] = useState<TaskType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchEvents() {
+    async function fetchData() {
       if (!session) {
         setLoading(false);
         return;
@@ -32,25 +56,40 @@ const CalenderComp = () => {
 
       try {
         setLoading(true);
-        const res = await fetch("/api/calendar/events");
-
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || "Failed to fetch events");
+        // Fetch Calendar Events
+        const resEvents = await fetch("/api/calendar/events");
+        if (resEvents.ok) {
+          const data = await resEvents.json();
+          setEvents(data);
         }
 
-        const data = await res.json();
-        setEvents(data);
+        // Fetch Skills and Tasks
+        const resSkills = await fetch("/api/skills");
+        console.log(resSkills);
+        if (resSkills.ok) {
+          const data = await resSkills.json();
+          console.log("here you go with data", data);
+          setSkills(
+            data.skills.map((skill: SkillsFromBackendType) => ({
+              skillName: skill.skillName,
+              id: skill.id,
+              userId: skill.userId,
+              createdAt: skill.createdAt,
+            })),
+          );
+          setTasks(data.tasks);
+        }
+
         setError(null);
       } catch (err: any) {
-        console.error("Error fetching events:", err);
+        console.error("Error fetching data:", err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchEvents();
+    fetchData();
   }, [session]);
 
   const daysInMonth = (year: number, month: number) =>
@@ -122,22 +161,18 @@ const CalenderComp = () => {
           eventDate.getFullYear() === year
         );
       })
-    : events.filter((e) => new Date(e.start) >= new Date()).slice(0, 5); // Show upcoming 5 from now if no selection
+    : events.filter((e) => new Date(e.start) >= new Date()).slice(0, 5);
 
-  // Helper to categorize events visually
-  const getEventCategory = (title: string) => {
-    const t = title.toLowerCase();
-    if (t.includes("workshop") || t.includes("learn") || t.includes("class"))
-      return "workshop";
-    if (t.includes("meeting") || t.includes("sync") || t.includes("call"))
-      return "meeting";
-    if (t.includes("lab") || t.includes("research") || t.includes("test"))
-      return "lab";
-    return "testing"; // Default
-  };
   return (
     <div className="flex flex-col-reverse  lg:flex-row gap-8 w-full min-h-screen py-4 px-6 bg-(--background-color) mx-auto font-bubblegum">
-      <Navbar />
+      <Link
+        href="/"
+        className="fixed top-3 left-3 md:top-4 md:left-4 p-1 group rounded-md backdrop-blur-sm hover:bg-white/10 transition-all duration-500 cursor-pointer flex flex-col z-1000 flex-row items-center justify-center gap-1"
+      >
+        <ArrowLeft size={20} />
+        <span>Back</span>
+      </Link>
+
       {/* Left Section: Events */}
       <div className="flex-1 flex flex-col gap-6">
         <div className="flex justify-between md:justify-end items-center gap-2 md:gap-4 md:mt-24 lg:mt-0">
@@ -151,7 +186,7 @@ const CalenderComp = () => {
 
         <div className="flex flex-col gap-4">
           {error ? (
-            <div className="bg-red-50 p-6 rounded-[2rem] border border-red-100 flex flex-col items-center justify-center text-center gap-2">
+            <div className="bg-(--red-background) p-6 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2">
               <p className="text-red-600 font-medium">Error: {error}</p>
               <button
                 onClick={() => window.location.reload()}
@@ -160,44 +195,62 @@ const CalenderComp = () => {
                 Try reloading
               </button>
             </div>
-          ) : filteredEvents.length > 0 ? (
-            filteredEvents.map((event) => {
-              return (
-                <div
-                  key={event.id}
-                  className="bg-(--red-background) p-4 md:p-6 rounded-3xl md:rounded-[2rem] shadow-sm flex flex-col gap-3 hover:translate-y-[-4px] transition-all cursor-pointer"
-                >
-                  <div className="flex justify-between items-start  ">
-                   <h4 className="text-xs md:text-lg font-bold text-black uppercase tracking-wider">
-                    {event.title}
-                  </h4>
-                    <div className="flex items-center gap-1 whitespace-nowrap text-black/40 text-xs font-medium">
-                      <Clock className="w-3 h-3" />
-                      {new Date(event.start).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                  </div>
-                  
-                </div>
-              );
-            })
           ) : (
             <div className="bg-(--red-background)/0 p-12 rounded-[2rem] flex flex-col items-center justify-center text-center gap-2">
               <CalendarIcon className="w-5 h-5 md:w-8 md:h-8 text-(--text-color)/20" />
               <p className="text-(--text-color)/60 font-medium">
                 {session
-                  ? "No events scheduled for this day"
+                  ? "No activities for this day"
                   : "Sign in to see your events"}
               </p>
               {loading && (
                 <div className="text-sm text-(--text-color)/60 animate-pulse">
-                  Loading events...
+                  Loading data...
                 </div>
               )}
             </div>
           )}
+
+          <p className="text-(--text-color)/90 font-medium">
+            things you should be doing
+          </p>
+          <div className="flex gap-2 md:gap-4 flex-wrap">
+            {skills.map((skill) => (
+              <span
+                key={skill.id}
+                className={classNames(
+                  "flex gap-1 md:gap-2 xl:gap-4 items-center bg-(--red-background) p-1 px-2 rounded-md md:rounded-xl text-xs md:text-sm font-bold uppercase border-2 border-(--text-color) text-black transition-all",
+                  "shadow-[3px_3px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5",
+                  {
+                    "shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)]":
+                      theme === "black",
+                  },
+                )}
+              >
+                {skill.skillName}
+              </span>
+            ))}
+          </div>
+          <p className="text-(--text-color)/90 font-medium">
+            things you are doing
+          </p>
+          <div className="flex gap-2 md:gap-4 flex-wrap">
+            {tasks.map((task) => (
+              <span
+                key={task.id}
+                className={classNames(
+                  "flex gap-1 md:gap-2 xl:gap-4 items-center bg-(--red-background) p-1 px-2 rounded-md md:rounded-xl text-xs md:text-sm font-bold uppercase border-2 border-(--text-color) text-black transition-all",
+                  "shadow-[3px_3px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5",
+                  {
+                    "shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)]":
+                      theme === "black",
+                  },
+                )}
+              >
+                {task.title}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 

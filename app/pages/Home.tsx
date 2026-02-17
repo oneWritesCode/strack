@@ -319,10 +319,10 @@ function Home() {
           <FaCalendar size={24} className="cursor-pointer md:block hidden" />
           <FaCalendar size={18} className="cursor-pointer md:hidden block" />
         </Link>
-        <Link href="/clock" title="Clock">
+        {/* <Link href="/clock" title="Clock">
           <FaClock size={24} className="cursor-pointer md:block hidden" />
           <FaClock size={18} className="cursor-pointer md:hidden block" />
-        </Link>
+        </Link> */}
       </div>
 
       <div className="w-full flex flex-col items-center justify-center pt-5 md:pt-4 px-4">
