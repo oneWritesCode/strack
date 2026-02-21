@@ -271,7 +271,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
         </div>
       </div>
 
-      <div className="w-full max-w-4xl mx-auto px-4 pt-12 md:pt-8">
+      <div className="w-full max-w-4xl mx-auto px-4 pt-12 md:pt-20">
         <h1 className="text-4xl md:text-5xl font-bold md:mb-8 uppercase border-b-4 border-black inline-block text-(--text-color)">
           {cardTitle || id}
         </h1>

@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# firebase thing
+skilltracker-firebase-admin.json
+
 # debug
 npm-debug.log*
 yarn-debug.log*
