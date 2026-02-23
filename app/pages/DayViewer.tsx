@@ -205,7 +205,7 @@ export default function DayViewer({ date }: DayViewerProps) {
           {tasksDone.map((singleTask, idx) => (
             <div
               key={idx}
-              className="px-2 py-1 bg-[#000] text-white rounded-2xl flex items-center gap-2 pointer-events-none"
+              className="px-2 py-1 bg-(--backgrond-color) text-white rounded-2xl flex items-center gap-2 pointer-events-none"
             >
               <span>{singleTask.title}</span>
               <button className="text-white p-0.5" disabled>

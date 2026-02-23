@@ -384,9 +384,6 @@ function Home() {
             title="Change Layout"
           >
             {getLayoutIcon()}
-            {/* <span className="hidden md:inline uppercase text-xs tracking-widest">
-              {layout}
-            </span> */}
           </button>
         </div>
 

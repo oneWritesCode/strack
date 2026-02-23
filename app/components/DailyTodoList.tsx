@@ -38,7 +38,7 @@ export default function DailyTodoList() {
                   content: [
                     {
                       type: "text",
-                      text: "you write nothing about your day yet!!",
+                      text: "you haven't written anything about your day yet !!",
                     },
                   ],
                 },

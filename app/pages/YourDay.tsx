@@ -168,7 +168,7 @@ export default function Editor() {
     <div className="w-full relative bg-(--background-color) min-h-screen flex items-center justify- ovreflow-hidden flex-col overflow-hidden font-bubblegum">
       <Navbar />
       {/* editor toolbar */}
-      <div className="w-full border-b border-b-(--text-color) relative top-0 p-2 md:pt-4 md:pb-2 flex items-center justify-end overflow-x-auto z-10 scrollbar-hide md:gap-1 px-2 md:px-4 text-(--text-color)">
+      <div className="w-full border-b border-b-(--text-color)/20 relative top-0 p-2 md:pt-4 md:pb-2 flex items-center justify-end overflow-x-auto z-10 scrollbar-hide md:gap-1 px-2 md:px-4 text-(--text-color)">
         <div className="inline-flex items-center justify-center rounded-xl md:px-2 md:py-1 md:gap-1 mr-2 md:px-3 md:mr-3 ">
           {/* undo button */}
           <button
