@@ -61,12 +61,9 @@ export default function Graph() {
 
   const getColor = (count: number) => {
     if (count === 0) return "bg-(--background-color) border-(--text-color)/80";
-    if (count <= 2)
-      return "bg-(--red-background)/30 border-(--text-color)/10";
-    if (count <= 4)
-      return "bg-(--red-background)/50 border-(--text-color)/20";
-    if (count <= 6)
-      return "bg-(--red-background)/70 border-(--text-color)/30";
+    if (count <= 2) return "bg-(--red-background)/30 border-(--text-color)/10";
+    if (count <= 4) return "bg-(--red-background)/50 border-(--text-color)/20";
+    if (count <= 6) return "bg-(--red-background)/70 border-(--text-color)/30";
     return "bg-(--red-background) border-(--text-color)";
   };
 

@@ -76,10 +76,10 @@ const NoteCard = ({
         <div className="flex items-center gap-2 mb-0.5">
           <h3
             className={classnames(
-              "font-bold text-black uppercase tracking-wider truncate max-w-[80%]",
+              "font-bold text-black uppercase tracking-wider line-clamp-1 overflow-hidden max-w-[60%]",
               {
-                "text-xl md:text-3xl": !isList,
-                "text-lg md:text-2xl": isList,
+                "text-xl md:text-2xl": !isList,
+                "text-lg md:text-xl": isList,
               },
             )}
           >

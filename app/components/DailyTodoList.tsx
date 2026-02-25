@@ -155,13 +155,12 @@ export default function DailyTodoList() {
             {tasks.map((task, idx) => (
               <li key={idx} className="flex items-center gap-2 group">
                 <button
-                  onClick={() => toggleTask(idx)} 
+                  onClick={() => toggleTask(idx)}
                   className={classnames(
                     "flex-1 flex items-center gap-2 p-1 rounded-lg transition-all text-left",
                     {
                       "text-(--text-color)/40": task.completed,
-                      "text-(--text-color) hover:bg-black/10":
-                        !task.completed,
+                      "text-(--text-color) hover:bg-black/10": !task.completed,
                       "": !isExpanded,
                     },
                   )}
