@@ -210,7 +210,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
           className="flex items-center gap-2 font-bold hover:scale-105 transition-transform"
         >
           <ArrowLeft size={20} />
-          <span>Back</span>
+          <span className="md:block hidden" >Back</span>
         </Link>
 
         <div className="flex items-center md:gap-2">
@@ -234,6 +234,13 @@ export default function NoteViewer({ id }: NoteViewerProps) {
             className="px-2 font-bold hover:scale-105 cursor-pointer hover:bg-white/10 rounded-full transition-all"
           >
             B
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            title="strike"
+            className="h-6 px-2 line-through rounded-md cursor-pointer hover:scale-105 hover:text-(--red-background) transition-all "
+          >
+            Strike
           </button>
           <button
             onClick={() => editor?.chain().focus().toggleItalic().run()}
