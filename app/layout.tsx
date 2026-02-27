@@ -3,15 +3,6 @@ import { Funnel_Sans, Bubblegum_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import Loading from "./components/Loading";
-// import NotificationPermission from "./components/NotificationPermission";
-// import Footer from "./components/Footer";
-
-// Service worker registration moved to NotificationPermission.tsx
-
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
 
 const FunnelSans = Funnel_Sans({
   variable: "--font-funnel-sans",

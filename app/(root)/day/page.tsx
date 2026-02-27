@@ -5,6 +5,7 @@ import YourDay from "@/app/pages/YourDay";
 import LoginPage from "../../components/LoginPage";
 import { useSession } from "next-auth/react";
 import Cookies from "js-cookie";
+import { Loader } from "@/app/components/Loading";
 
 export default function LoginButton() {
   const { data: session } = useSession();
@@ -20,7 +21,7 @@ export default function LoginButton() {
   }, []);
 
   if (isChecking) {
-    return null; // Or a loading spinner
+    return <Loader/>;
   }
 
   if (!session && !hasCookie) {

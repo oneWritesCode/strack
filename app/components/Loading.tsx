@@ -29,7 +29,7 @@ if (document.readyState === "complete") {
 }
 
 
-const Loader = ({ isLoading }: LoaderProps) => {
+export const Loader = ({ isLoading }: LoaderProps) => {
 
   return (
     <div
