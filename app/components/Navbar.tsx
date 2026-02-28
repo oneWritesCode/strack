@@ -183,6 +183,26 @@ export default function Navbar() {
                 View Profile
               </button>
             </Link>
+
+            <Link
+              href="/dashboard"
+              onClick={() => setIsOpen(false)}
+              className={classname(
+                "flex items-center gap-3 rounded-xl transition-all cursor-pointer border-2",
+                {
+                  "bg-(--light-background) text-(--background-color) border-(--light-background)":
+                    pathname === "/dashboard",
+                  "bg-white text-black border-white":
+                    pathname === "/dashboard" && theme === "black",
+                  "text-(--text-color) border-(--text-color) hover:border-white hover:bg-white hover:text-black":
+                    pathname !== "/dashboard",
+                },
+              )}
+            >
+              <button className="w-full py-2 px-4 rounded-xl transition-all text-sm font-bold cursor-pointer">
+                Dashboard
+              </button>
+            </Link>
           </div>
 
           <div className="cursor-pointer">

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import LoginPage from "../../components/LoginPage";
 import { useSession } from "next-auth/react";
 import Cookies from "js-cookie";
-import Calender from "@/app/pages/Calender";
+import Dashboard from "@/app/pages/Dashboard";
 
 export default function LoginButton() {
   const { data: session } = useSession();
@@ -27,5 +27,5 @@ export default function LoginButton() {
     return <LoginPage />;
   }
 
-  return <Calender />;
+  return <Dashboard />;
 }

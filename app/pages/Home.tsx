@@ -158,7 +158,7 @@ function Home() {
   );
   const [newCardCategory, setNewCardCategory] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
-
+  const [showErrorWhileAddingCard, setShowErrorWhileAddingCard] = useState("");
   useEffect(() => {
     const savedName = Cookies.get("sk_user_name");
     if (savedName) setOptimisticName(savedName);
@@ -235,10 +235,33 @@ function Home() {
 
   const addCard = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCardTitle.trim()) return;
+
+    const trimmedTitle = newCardTitle.trim();
+
+    if (!trimmedTitle) {
+      setShowErrorWhileAddingCard("Title cannot be empty!");
+      return;
+    }
+
+    // 1. Check for special characters (allow only alphanumeric and spaces)
+    if (/[^a-zA-Z0-9\s]/.test(trimmedTitle)) {
+      setShowErrorWhileAddingCard("Title cannot contain special characters!");
+      return;
+    }
+
+    // 2. Check for duplicate titles (case-insensitive)
+    const isDuplicate = cards.some(
+      (card) => card.title.toLowerCase() === trimmedTitle.toLowerCase(),
+    );
+
+    if (isDuplicate) {
+      setShowErrorWhileAddingCard("A card with this title already exists!");
+      return;
+    }
+
     const newCard: Card = {
-      id: newCardTitle.toLowerCase().replace(/\s+/g, "-"),
-      title: newCardTitle.trim(),
+      id: trimmedTitle.toLowerCase().replace(/\s+/g, "-"),
+      title: trimmedTitle,
       category: newCardCategory.trim() || "none",
       isStarred: false,
     };
@@ -246,6 +269,7 @@ function Home() {
     setNewCardTitle("");
     setNewCardCategory("");
     setIsAdding(false);
+    setShowErrorWhileAddingCard("");
   };
 
   const toggleStar = (e: React.MouseEvent, id: string) => {
@@ -315,14 +339,10 @@ function Home() {
             ></button>
           ))}
         </div>
-        <Link href="/calender" title="Calender">
+        <Link href="/dashboard" title="dashboard">
           <FaCalendar size={24} className="cursor-pointer md:block hidden" />
           <FaCalendar size={18} className="cursor-pointer md:hidden block" />
         </Link>
-        {/* <Link href="/clock" title="Clock">
-          <FaClock size={24} className="cursor-pointer md:block hidden" />
-          <FaClock size={18} className="cursor-pointer md:hidden block" />
-        </Link> */}
       </div>
 
       <div className="w-full flex flex-col items-center justify-center pt-5 md:pt-4 px-4">
@@ -423,7 +443,18 @@ function Home() {
                     onStarToggle={toggleStar}
                   />
                 ))}
-                <AddCardBtn onClick={() => setIsAdding(true)} />
+                <AddCardBtn
+                  onClick={() => {
+                    setNewCardTitle("");
+                    setShowErrorWhileAddingCard("");
+                    setIsAdding(true);
+                    if (activeFilter !== "all" && activeFilter !== "starred") {
+                      setNewCardCategory(activeFilter);
+                    } else {
+                      setNewCardCategory("");
+                    }
+                  }}
+                />
               </div>
             </>
           )}
@@ -440,7 +471,19 @@ function Home() {
                   onStarToggle={toggleStar}
                 />
               ))}
-              <AddCardBtn onClick={() => setIsAdding(true)} isGrid />
+              <AddCardBtn
+                onClick={() => {
+                  setNewCardTitle("");
+                  setShowErrorWhileAddingCard("");
+                  setIsAdding(true);
+                  if (activeFilter !== "all" && activeFilter !== "starred") {
+                    setNewCardCategory(activeFilter);
+                  } else {
+                    setNewCardCategory("");
+                  }
+                }}
+                isGrid
+              />
             </div>
           )}
 
@@ -456,7 +499,19 @@ function Home() {
                   onStarToggle={toggleStar}
                 />
               ))}
-              <AddCardBtn onClick={() => setIsAdding(true)} isList />
+              <AddCardBtn
+                onClick={() => {
+                  setNewCardTitle("");
+                  setShowErrorWhileAddingCard("");
+                  setIsAdding(true);
+                  if (activeFilter !== "all" && activeFilter !== "starred") {
+                    setNewCardCategory(activeFilter);
+                  } else {
+                    setNewCardCategory("");
+                  }
+                }}
+                isList
+              />
             </div>
           )}
         </div>
@@ -476,15 +531,20 @@ function Home() {
                 placeholder="Title (e.g. Gym, Poems...)"
                 className="w-full border-2 border-(--text-color) p-3 rounded-xl mb-4 outline-none bg-transparent text-(--text-color) focus:bg-(--text-color)/10"
                 value={newCardTitle}
-                onChange={(e) => setNewCardTitle(e.target.value)}
+                onChange={(e) => {
+                  setNewCardTitle(e.target.value);
+                }}
               />
               <input
                 type="text"
                 placeholder="Category (e.g. Work, Personal) - optional"
-                className="w-full border-2 border-(--text-color) p-3 rounded-xl mb-6 outline-none bg-transparent text-(--text-color) focus:bg-(--text-color)/10"
+                className="w-full border-2 border-(--text-color) p-3 rounded-xl outline-none bg-transparent text-(--text-color) focus:bg-(--text-color)/10"
                 value={newCardCategory}
                 onChange={(e) => setNewCardCategory(e.target.value)}
               />
+              <p className="text-center text-red-400 mb-2 mt-4">
+                {showErrorWhileAddingCard}
+              </p>
               <div className="flex gap-4">
                 <button
                   type="submit"
@@ -494,7 +554,12 @@ function Home() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsAdding(false)}
+                  onClick={() => {
+                    setIsAdding(false);
+                    setNewCardTitle("");
+                    setNewCardCategory("");
+                    setShowErrorWhileAddingCard("");
+                  }}
                   className="flex-1 border-2 border-(--text-color) text-(--text-color) py-2 md:py-3 rounded-xl font-bold hover:bg-(--text-color)/10 transition-colors"
                 >
                   Cancel

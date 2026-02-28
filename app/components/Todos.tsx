@@ -89,16 +89,6 @@ export default function skills() {
     setShowInput(false);
   };
 
-  // const addSkill = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (!inputValue.trim()) return;
-
-  //   saveSkillInDB();
-
-  //   setInputValue("");
-  //   setShowInput(false);
-  // };
-
   return (
     <div
       className={`w-full my-3 capitalize font-medium text-sm text-(--text-color)`}

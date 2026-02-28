@@ -12,7 +12,7 @@ type Task = {
 };
 
 export default function DailyTodoList() {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState("");
   const [journalContent, setJournalContent] = useState<string | null>(null);
@@ -126,7 +126,7 @@ export default function DailyTodoList() {
                 : "What's the plan?"}
             </p>
           </div>
-          <button
+          {/* <button
             onClick={(e) => {
               e.stopPropagation();
               setIsExpanded(!isExpanded);
@@ -139,7 +139,7 @@ export default function DailyTodoList() {
             ) : (
               <Maximize2 size={20} className="text-(--text-color)" />
             )}
-          </button>
+          </button> */}
         </div>
 
         <div
