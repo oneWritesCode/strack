@@ -19,6 +19,7 @@ import { useTheme } from "../context/ThemeContext";
 import classnames from "classnames";
 
 import { DEFAULT_CARDS, type Card } from "../lib/constants";
+import { syncNotesWithDatabase } from "../lib/syncNotes";
 
 const NoteCard = ({
   card,
@@ -169,6 +170,15 @@ function Home() {
     const loadedCards = savedCards ? JSON.parse(savedCards) : DEFAULT_CARDS;
     setCards(loadedCards);
 
+    // Run the sync engine
+    syncNotesWithDatabase().then(() => {
+      // Force refresh from localstorage when sync completes successfully
+      const freshlySyncedCardsStr = localStorage.getItem("skilltracker_cards");
+      if (freshlySyncedCardsStr) {
+        setCards(JSON.parse(freshlySyncedCardsStr));
+      }
+    });
+
     // Load saved layout
     const savedLayout = localStorage.getItem("skilltracker_layout");
     if (
@@ -233,7 +243,7 @@ function Home() {
     localStorage.setItem("skilltracker_cards", JSON.stringify(updatedCards));
   };
 
-  const addCard = (e: React.FormEvent) => {
+  const addCard = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const trimmedTitle = newCardTitle.trim();
@@ -259,17 +269,40 @@ function Home() {
       return;
     }
 
+    setIsAdding(false);
+
+    const newCardId = trimmedTitle.toLowerCase().replace(/\s+/g, "-");
     const newCard: Card = {
-      id: trimmedTitle.toLowerCase().replace(/\s+/g, "-"),
+      id: newCardId,
       title: trimmedTitle,
       category: newCardCategory.trim() || "none",
       isStarred: false,
     };
+
+    // Save to local storage Optimistically
     saveCards([...cards, newCard]);
     setNewCardTitle("");
     setNewCardCategory("");
-    setIsAdding(false);
     setShowErrorWhileAddingCard("");
+
+    // Save to Database
+    try {
+      if (session?.user) {
+        await fetch("/api/notes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: newCardId,
+            title: trimmedTitle,
+            category: newCardCategory.trim() || "none",
+            isStarred: false,
+            isListNote: false,
+          }),
+        });
+      }
+    } catch (err) {
+      console.error("Failed to save card to database:", err);
+    }
   };
 
   const toggleStar = (e: React.MouseEvent, id: string) => {

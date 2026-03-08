@@ -31,7 +31,8 @@ export default function NoteViewer({ id }: NoteViewerProps) {
 
   const storageKey = `extra_card_${id}`;
 
-  const deleteCard = () => {
+  const deleteCard = async () => {
+    // Delete from LocalStorage Optimistically
     const savedCards = localStorage.getItem("skilltracker_cards");
     if (savedCards) {
       const cards = JSON.parse(savedCards);
@@ -39,6 +40,16 @@ export default function NoteViewer({ id }: NoteViewerProps) {
       localStorage.setItem("skilltracker_cards", JSON.stringify(updatedCards));
     }
     localStorage.removeItem(storageKey);
+
+    // Delete from Database
+    try {
+      await fetch(`/api/notes?id=${id}`, {
+        method: "DELETE",
+      });
+    } catch (err) {
+      console.error("Failed to delete card from database:", err);
+    }
+
     router.push("/");
   };
 
@@ -210,7 +221,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
           className="flex items-center gap-2 font-bold hover:scale-105 transition-transform"
         >
           <ArrowLeft size={20} />
-          <span className="md:block hidden" >Back</span>
+          <span className="md:block hidden">Back</span>
         </Link>
 
         <div className="flex items-center md:gap-2">
