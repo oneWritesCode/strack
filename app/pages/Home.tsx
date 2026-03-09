@@ -40,7 +40,7 @@ const NoteCard = ({
     <Link
       href={`/notes/${card.id}`}
       className={classnames(
-        "group relative transition-all duration-400 flex flex-col items-start cursor-pointer border-2 border-(--text-color) rounded-xl md:rounded-3xl p-2 md:p-4 hover:shadow-none hover:translate-x-1 hover:translate-y-1",
+        "group relative transition-all duration-400 flex flex-col items-start cursor-pointer border-2 border-(--text-color) rounded-2xl md:rounded-3xl p-2 md:p-4 hover:shadow-none hover:translate-x-1 hover:translate-y-1",
         {
           "min-w-[50vw] max-w-[20vw] md:min-w-70 md:max-w-40 h-20 md:h-30 bg-(--red-background) shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] md:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]":
             !isGrid && !isList,
@@ -62,8 +62,10 @@ const NoteCard = ({
         className="absolute top-2 right-2 md:top-3 md:right-3 z-10 transition-transform active:scale-150"
       >
         <Star
-          size={isList ? 20 : 24}
+          // size={isList ? 20 : 24}
           className={classnames("transition-all text-black", {
+            "text-4xl":isList ,
+            "text-2xl":!isList ,
             "fill-yellow-400 text-black drop-shadow-sm": card.isStarred,
           })}
         />
@@ -79,7 +81,7 @@ const NoteCard = ({
             className={classnames(
               "font-bold text-black uppercase tracking-wider line-clamp-1 overflow-hidden max-w-[60%]",
               {
-                "text-xl md:text-2xl": !isList,
+                "text-md md:text-2xl": !isList,
                 "text-lg md:text-xl": isList,
               },
             )}
@@ -87,7 +89,7 @@ const NoteCard = ({
             {card.title}
           </h3>
           {card.category && card.category !== "none" && (
-            <span className="bg-black/10 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-md text-black/60">
+            <span className="bg-black/10 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-md text-black/60 md:block hidden   ">
               {card.category}
             </span>
           )}
@@ -95,7 +97,7 @@ const NoteCard = ({
         {preview ? (
           <p
             className={classnames(
-              "text-xs md:text-sm text-black/60 font-semibold line-clamp-2",
+              "text-xs md:text-sm text-black/60 line-clamp-2 font-medium",
             )}
           >
             {preview}
@@ -380,11 +382,11 @@ function Home() {
 
       <div className="w-full flex flex-col items-center justify-center pt-5 md:pt-4 px-4">
         {/* Welcome Section */}
-        <div className="w-full mb-6 md:mb-10">
+        <div className="w-full mb-4 md:mb-6">
           <h1 className="text-3xl md:text-6xl font-medium text-(--text-color)">
             Hi {session?.user?.name || optimisticName || "there"},
           </h1>
-          <p className="max-w-lg pb-2 text-(--text-color)/80">
+          <p className="max-w-lg text-(--text-color)/80">
             how's your day?
           </p>
         </div>
@@ -447,7 +449,7 @@ function Home() {
               key={filter}
               onClick={() => setActiveFilter(filter)}
               className={classnames(
-                "px-4 py-1.5 rounded-full border-2 text-xs md:text-sm font-bold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer",
+                "px-2 md:px-4 py-1 md:py-1.5 rounded-full border-2 text-xs md:text-sm font-bold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer",
                 {
                   "bg-(--text-color) text-(--background-color) border-(--text-color)":
                     activeFilter === filter,

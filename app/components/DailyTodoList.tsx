@@ -203,18 +203,18 @@ export default function DailyTodoList() {
 
         {isExpanded && (
           <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
-            <form onSubmit={addTask} className="flex items-center gap-2 mt-2">
+            <form onSubmit={addTask} className="flex items-center gap-1 md:gap-2 mt-2 w-full">
               <input
                 autoFocus
                 type="text"
                 placeholder="Add todo..."
                 value={newTask}
                 onChange={(e) => setNewTask(e.target.value)}
-                className="flex-1 bg-(--text-color)/10 border border-gray-600 rounded-lg px-3 py-1 text-sm text-(--text-color) placeholder:text-(--text-color)/30 outline-none focus:border transition-all"
+                className="w-[60%] flex-1 bg-(--text-color)/10 border border-(--text-color)/60 rounded-xl px-2 md:px-3 py-0.5 md:py-1 text-sm text-(--text-color) placeholder:text-(--text-color)/30 outline-none focus:border transition-all"
               />
               <button
                 type="submit"
-                className="bg-(--text-color)/10 text-(--text-color) p-2 rounded-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                className="bg-(--text-color)/10 text-(--text-color) p-1 md:p-2 rounded-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
               >
                 <Plus size={20} />
               </button>

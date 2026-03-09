@@ -215,7 +215,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
   return (
     <div className="w-full relative bg-(--background-color) min-h-screen flex flex-col overflow-hidden font-bubblegum">
       {/* Toolbar */}
-      <div className="w-full fixed bg-(--background-color) shadow-xl shadow-(--background-color) border-b border-b-black p-2 md:pt-4 md:pb-2 flex items-center justify-between pt-2 md:pt-0 gap-3 px-2 md:px-4 text-(--text-color) z-10000">
+      <div className="w-full fixed bg-(--background-color) shadow-xl shadow-(--background-color) p-2 md:pt-4 md:pb-2 flex items-center justify-between pt-2 md:pt-0 gap-3 px-2 md:px-4 text-(--text-color) z-10000">
         <Link
           href="/"
           className="flex items-center gap-2 font-bold hover:scale-105 transition-transform"
@@ -289,7 +289,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
         </div>
       </div>
 
-      <div className="w-full max-w-4xl mx-auto px-4 pt-12 md:pt-20">
+      <div className="w-full max-w-4xl mx-auto px-4 pt-20 md:pt-26">
         <h1 className="text-4xl md:text-5xl font-bold md:mb-8 uppercase border-b-4 border-black inline-block text-(--text-color)">
           {cardTitle || id}
         </h1>
@@ -297,7 +297,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
         <div className="editorContent min-h-[50vh] prose prose-sm md:prose-lg max-w-none border-t-2 border-black/10 pt-6 text-(--text-color)">
           <EditorContent
             editor={editor}
-            className="outline-none border-none cursor-text text-lg text-gray-300"
+            className="outline-none border-none cursor-text text-lg"
           />
         </div>
 
