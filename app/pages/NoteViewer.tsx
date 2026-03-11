@@ -8,8 +8,8 @@ import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
 import { FontSize } from "@/app/extensions/FontSize";
 import Image from "@tiptap/extension-image";
-import { Redo, Undo, Loader2, ArrowLeft } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { Redo, Undo, Loader2, ArrowLeft, BookOpen } from "lucide-react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import classnames from "classnames";
 import { useTheme } from "../context/ThemeContext";
 import Link from "next/link";
@@ -26,13 +26,35 @@ export default function NoteViewer({ id }: NoteViewerProps) {
   const [showSuccess, setShowSuccess] = useState(false);
   const [cardTitle, setCardTitle] = useState("");
   const [showDeleteBtn, setShowDeleteBtn] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageWidth, setPageWidth] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
 
   const storageKey = `extra_card_${id}`;
+  const bookViewKey = `bookview_${id}`;
+
+  // Load book view preference from localStorage
+  const [isBookView, setIsBookView] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(bookViewKey) === "true";
+    }
+    return false;
+  });
+
+  // Persist book view preference
+  const toggleBookView = useCallback(() => {
+    setIsBookView((prev) => {
+      const next = !prev;
+      localStorage.setItem(bookViewKey, String(next));
+      return next;
+    });
+    setCurrentPage(1);
+  }, [bookViewKey]);
 
   const deleteCard = async () => {
-    // Delete from LocalStorage Optimistically
     const savedCards = localStorage.getItem("skilltracker_cards");
     if (savedCards) {
       const cards = JSON.parse(savedCards);
@@ -40,12 +62,10 @@ export default function NoteViewer({ id }: NoteViewerProps) {
       localStorage.setItem("skilltracker_cards", JSON.stringify(updatedCards));
     }
     localStorage.removeItem(storageKey);
+    localStorage.removeItem(bookViewKey);
 
-    // Delete from Database
     try {
-      await fetch(`/api/notes?id=${id}`, {
-        method: "DELETE",
-      });
+      await fetch(`/api/notes?id=${id}`, { method: "DELETE" });
     } catch (err) {
       console.error("Failed to delete card from database:", err);
     }
@@ -110,18 +130,63 @@ export default function NoteViewer({ id }: NoteViewerProps) {
 
   const [lastUpdateTrigger, setLastUpdateTrigger] = useState(0);
 
+  // Measure the container width and calculate pages
+  const updatePagination = useCallback(() => {
+    if (!isBookView || !scrollContainerRef.current) return;
+
+    const container = scrollContainerRef.current;
+    const cw = container.clientWidth;
+    setPageWidth(cw);
+
+    // Wait a frame so scrollWidth reflects the column layout
+    requestAnimationFrame(() => {
+      const sw = container.scrollWidth;
+      const sl = container.scrollLeft;
+      const pages = Math.max(1, Math.round(sw / cw));
+      setTotalPages(pages);
+      setCurrentPage(Math.min(pages, Math.round(sl / cw) + 1));
+    });
+  }, [isBookView]);
+
+  // Recalculate when book view toggles or content changes
+  useEffect(() => {
+    if (!isBookView) return;
+    // Small delay to let CSS columns render
+    const t = setTimeout(updatePagination, 100);
+    return () => clearTimeout(t);
+  }, [isBookView, lastUpdateTrigger, updatePagination]);
+
+  // Recalculate on window resize
+  useEffect(() => {
+    if (!isBookView) return;
+    const handleResize = () => updatePagination();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isBookView, updatePagination]);
+
+  // Navigate to exact page position
+  const goToPage = useCallback(
+    (page: number) => {
+      if (!scrollContainerRef.current || !pageWidth) return;
+      const target = (page - 1) * pageWidth;
+      scrollContainerRef.current.scrollTo({ left: target, behavior: "smooth" });
+    },
+    [pageWidth],
+  );
+
+  const handleScroll = useCallback(() => {
+    if (!scrollContainerRef.current || !pageWidth) return;
+    const sl = scrollContainerRef.current.scrollLeft;
+    setCurrentPage(Math.round(sl / pageWidth) + 1);
+  }, [pageWidth]);
+
   useEffect(() => {
     if (lastUpdateTrigger === 0 || !editor) return;
-
-    const timer = setTimeout(() => {
-      saveToLocalStorage();
-    }, 1500);
-
+    const timer = setTimeout(() => saveToLocalStorage(), 1500);
     return () => clearTimeout(timer);
   }, [lastUpdateTrigger]);
 
   useEffect(() => {
-    // 1. Load card title from local cards list or fallback to DEFAULT_CARDS
     const savedCardsString = localStorage.getItem("skilltracker_cards");
     let cardTitleFromList = "";
     let defaultContentFromCard = "";
@@ -131,13 +196,11 @@ export default function NoteViewer({ id }: NoteViewerProps) {
       const currentCard = cards.find((c: any) => c.id === id);
       if (currentCard) {
         cardTitleFromList = currentCard.title;
-        // Prioritize contentHTML if it exists
         defaultContentFromCard =
           currentCard.contentHTML || currentCard.content || "";
       }
     }
 
-    // If not found in localStorage cards, check DEFAULT_CARDS
     if (!cardTitleFromList) {
       const defaultCard = DEFAULT_CARDS.find((c) => c.id === id);
       if (defaultCard) {
@@ -149,9 +212,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
 
     setCardTitle(cardTitleFromList);
 
-    // 2. Load editor content
     if (editor) {
-      // Priority 1: Specific saved content for this note
       const savedNoteData = localStorage.getItem(storageKey);
       if (savedNoteData) {
         try {
@@ -179,16 +240,14 @@ export default function NoteViewer({ id }: NoteViewerProps) {
 
     const contentJSON = editor.getJSON();
     const contentHTML = editor.getHTML();
-    const contentText = editor.getText(); // Plain text for previews
+    const contentText = editor.getText();
 
-    // Update specific note data
     const data = {
       content: contentJSON,
       lastUpdated: new Date().toISOString(),
     };
     localStorage.setItem(storageKey, JSON.stringify(data));
 
-    // Update the card in the main cards list for previews
     const savedCardsString = localStorage.getItem("skilltracker_cards");
     if (savedCardsString) {
       const cards = JSON.parse(savedCardsString);
@@ -196,8 +255,8 @@ export default function NoteViewer({ id }: NoteViewerProps) {
         if (card.id === id) {
           return {
             ...card,
-            content: contentText, // Plain text for Home page
-            contentHTML: contentHTML, // HTML for subsequent loads
+            content: contentText,
+            contentHTML: contentHTML,
           };
         }
         return card;
@@ -249,7 +308,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
           <button
             onClick={() => editor.chain().focus().toggleStrike().run()}
             title="strike"
-            className="h-6 px-2 line-through rounded-md cursor-pointer hover:scale-105 hover:text-(--red-background) transition-all "
+            className="h-6 px-2 line-through rounded-md cursor-pointer hover:scale-105 hover:text-(--red-background) transition-all"
           >
             Strike
           </button>
@@ -276,9 +335,23 @@ export default function NoteViewer({ id }: NoteViewerProps) {
             </button>
             {showDeleteBtn && (
               <div className="absolute top-5 md:top-8 right-2 md:right-4 mt-2 w-25 md:w-30 bg-(--background-color) border-2 border-(--text-color) rounded-lg shadow-xl z-[110] overflow-hidden">
+                <div className="bg-(--text-color)/20 -1" />
+                <button
+                  onClick={toggleBookView}
+                  title="Toggle Book View"
+                  className={classnames(
+                    "w-full pl-2 p-1 transition-colors cursor-pointer flex items-center gap-3 text-xs md:text-base",
+                    isBookView
+                      ? "bg-(--text-color) text-(--background-color)"
+                      : "hover:bg-(--text-color)/10",
+                  )}
+                >
+                  <BookOpen size={18} /> book mode
+                </button>
+                
                 <button
                   onClick={deleteCard}
-                  className="w-full flex items-center gap-3 p-1 text-left text-xs md:text-md hover:bg-[#D73535] hover:text-white transition-colors text-(--text-color)"
+                  className="w-full flex items-center gap-3 pl-2 p-1 text-xs md:text-base hover:bg-[#D73535] hover:text-white transition-colors text-(--text-color)"
                 >
                   <Trash2 size={18} />
                   Delete Card
@@ -289,18 +362,75 @@ export default function NoteViewer({ id }: NoteViewerProps) {
         </div>
       </div>
 
-      <div className="w-full max-w-4xl mx-auto px-4 pt-20 md:pt-26">
-        <h1 className="text-4xl md:text-5xl font-bold md:mb-8 uppercase border-b-4 border-black inline-block text-(--text-color)">
-          {cardTitle || id}
+      <div className="w-full max-w-5xl mx-auto px-4 pt-20 md:pt-26">
+        <h1 className="text-4xl md:text-5xl font-bold md:mb-8 uppercase flex items-center gap-2 text-(--text-color)">
+          <span className="border-b-4 border-black"> {cardTitle || id}</span>
+          {isBookView && (
+            <span className="text-sm opacity-70">
+              Page {currentPage} / {totalPages}
+            </span>
+          )}
         </h1>
 
-        <div className="editorContent min-h-[50vh] prose prose-sm md:prose-lg max-w-none border-t-2 border-black/10 pt-6 text-(--text-color)">
-          <EditorContent
-            editor={editor}
-            className="outline-none border-none cursor-text text-lg"
-          />
-        </div>
+        {/* Book View Pagination Controls */}
 
+        {/* Editor Content */}
+        <div
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+          className={classnames(
+            "editorContent prose prose-sm md:prose-lg max-w-none border-t-2 border-black/10 pt-6 text-(--text-color)",
+            {
+              "min-h-[50vh] pb-32": !isBookView,
+              "h-[65vh] overflow-x-auto overflow-y-hidden scroll-smooth [&::-webkit-scrollbar]:hidden":
+                isBookView,
+            },
+          )}
+          style={
+            isBookView && pageWidth
+              ? {
+                  scrollSnapType: "x mandatory",
+                }
+              : undefined
+          }
+        >
+          <div
+            style={
+              isBookView
+                ? {
+                    height: "100%",
+                    columnWidth: `${pageWidth || 100}px`,
+                    columnGap: "0px",
+                    columnFill: "auto" as const,
+                  }
+                : undefined
+            }
+            className={isBookView ? "[&>*]:break-inside-avoid" : ""}
+          >
+            <EditorContent
+              editor={editor}
+              className="outline-none border-none cursor-text text-lg h-full"
+            />
+          </div>
+        </div>
+        {isBookView && (
+          <div className="flex justify-between items-center py-2 px-3 mb-2 mt-4">
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage <= 1}
+              className="px-4 py-1.5 font-bold text-sm rounded-md disabled:opacity-30 cursor-pointer hover:bg-(--text-color)/10 transition-colors"
+            >
+              ← Prev
+            </button>
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              className="px-4 py-1.5 font-bold text-sm rounded-md disabled:opacity-30 cursor-pointer hover:bg-(--text-color)/10 transition-colors"
+            >
+              Next →
+            </button>
+          </div>
+        )}
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2">
           <button
             onClick={saveToLocalStorage}
