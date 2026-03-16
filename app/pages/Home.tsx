@@ -2,12 +2,11 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { FaClock, FaCalendar } from "react-icons/fa";
+import { FaCalendar } from "react-icons/fa";
 import Cookies from "js-cookie";
 import Navbar from "../components/Navbar";
 import DailyTodoList from "../components/DailyTodoList";
 import {
-  Trash2,
   Search,
   LayoutGrid,
   List,

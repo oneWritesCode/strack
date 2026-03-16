@@ -1,5 +1,46 @@
 export async function syncNotesWithDatabase() {
   try {
+    const isSynced = localStorage.getItem("isSynced");
+
+    if (isSynced === "true") {
+      // isSynced is true — push all local notes to the DB
+      const localCardsStr = localStorage.getItem("skilltracker_cards");
+      const localCards = localCardsStr ? JSON.parse(localCardsStr) : [];
+
+      for (const card of localCards) {
+        const storageKey = `extra_card_${card.id}`;
+        const contentStr = localStorage.getItem(storageKey);
+        let contentJSON = null;
+
+        if (contentStr) {
+          try {
+            const parsed = JSON.parse(contentStr);
+            contentJSON = parsed.content;
+          } catch (e) {
+            console.error("Failed to parse extra_card data", e);
+          }
+        }
+
+        await fetch("/api/notes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: card.id,
+            title: card.title,
+            category: card.category || "none",
+            isStarred: card.isStarred || false,
+            isListNote: false,
+            content: card.content || null,
+            contentHTML: card.contentHTML || null,
+            contentJSON: contentJSON ? JSON.stringify(contentJSON) : null,
+          }),
+        });
+      }
+
+      return;
+    }
+
+    // isSynced is not true — keep the existing flow
     // 1. Fetch the notes from the database
     const res = await fetch("/api/notes");
     if (!res.ok) {
@@ -8,7 +49,7 @@ export async function syncNotesWithDatabase() {
     }
 
     const dbNotes = await res.json();
-    const dbNotesMap = new Map(dbNotes.map((n: any) => [n.id, n]));
+    const dbNotesMap = new Map(dbNotes.map((notes: any) => [notes.id, notes]));
 
     // 2. Fetch the notes from Local Storage
     const localCardsStr = localStorage.getItem("skilltracker_cards");
@@ -89,3 +130,4 @@ export async function syncNotesWithDatabase() {
     console.error("Error syncing notes:", error);
   }
 }
+
