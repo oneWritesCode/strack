@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { id, title, category, isStarred, isListNote, content, contentHTML, contentJSON } = body;
+    const { id, title, category, isStarred, isListNote, content, contentHTML, contentJSON, isPublic, password, bookView } = body;
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -68,6 +68,9 @@ export async function POST(req: Request) {
         content: content || null,
         contentHTML: contentHTML || null,
         contentJSON: contentJSON || null,
+        isPublic: isPublic !== undefined ? isPublic : undefined,
+        password: password !== undefined ? password : undefined,
+        bookView: bookView !== undefined ? bookView : undefined,
       },
       create: {
         id: id,
@@ -78,6 +81,9 @@ export async function POST(req: Request) {
         content: content || null,
         contentHTML: contentHTML || null,
         contentJSON: contentJSON || null,
+        isPublic: isPublic || false,
+        password: password || null,
+        bookView: bookView || false,
         userId: user.id,
       },
     });

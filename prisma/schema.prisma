@@ -102,6 +102,9 @@ model Note {
   isListNote  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  isPublic    Boolean  @default(false)
+  password    String?
+  bookView    Boolean  @default(false)
 
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   listItems NoteItem[]
