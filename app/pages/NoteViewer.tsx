@@ -8,8 +8,9 @@ import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
 import { FontSize } from "@/app/extensions/FontSize";
 import Image from "@tiptap/extension-image";
-import { Redo, Undo, Loader2, ArrowLeft, BookOpen } from "lucide-react";
+import { Redo, Undo, Loader2, ArrowLeft, BookOpen, X, Lock, Mail, CheckCircle2, Circle, Eye, EyeOff, Share2, Check } from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import classnames from "classnames";
 import { useTheme } from "../context/ThemeContext";
 import Link from "next/link";
@@ -32,6 +33,26 @@ export default function NoteViewer({ id }: NoteViewerProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
+
+  const { data: session } = useSession();
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [publicPassword, setPublicPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishInBookView, setPublishInBookView] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
+  const [showShared, setShowShared] = useState(false);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(true);
+
+  const passwordRules = [
+    { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
+    { label: "At least 1 uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
+    { label: "At least 1 lowercase letter", test: (p: string) => /[a-z]/.test(p) },
+    { label: "At least 1 number", test: (p: string) => /[0-9]/.test(p) },
+    { label: "At least 1 special character", test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+  ];
+  
+  const isPasswordValid = passwordRules.every(rule => rule.test(publicPassword));
 
   const storageKey = `extra_card_${id}`;
   const bookViewKey = `bookview_${id}`;
@@ -198,6 +219,9 @@ export default function NoteViewer({ id }: NoteViewerProps) {
         cardTitleFromList = currentCard.title;
         defaultContentFromCard =
           currentCard.contentHTML || currentCard.content || "";
+        if (currentCard.isPublic) {
+          setIsPublished(true);
+        }
       }
     }
 
@@ -211,6 +235,26 @@ export default function NoteViewer({ id }: NoteViewerProps) {
     }
 
     setCardTitle(cardTitleFromList);
+
+    // Sync from DB to ensure isPublished status is fresh
+    fetch(`/api/notes/public-note/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.note) {
+          if (data.note.isPublic) {
+            setIsPublished(true);
+            setPublishInBookView(data.note.bookView || false);
+          }
+          if (data.note.title && !cardTitleFromList) {
+            setCardTitle(data.note.title);
+          }
+        }
+        setIsCheckingStatus(false);
+      })
+      .catch(err => {
+        console.error("Error syncing note info:", err);
+        setIsCheckingStatus(false);
+      });
 
     if (editor) {
       const savedNoteData = localStorage.getItem(storageKey);
@@ -269,6 +313,67 @@ export default function NoteViewer({ id }: NoteViewerProps) {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     }, 500);
+  };
+
+  const makeNotePublic = async () => {
+    if (!editor) return;
+    setIsPublishing(true);
+
+    try {
+      const res = await fetch("/api/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          title: cardTitle || id,
+          content: editor.getText(),
+          contentHTML: editor.getHTML(),
+          contentJSON: JSON.stringify(editor.getJSON()),
+          isPublic: true,
+          password: publicPassword,
+          bookView: publishInBookView,
+        }),
+      });
+
+      if (res.ok) {
+        const savedCardsString = localStorage.getItem("skilltracker_cards");
+        if (savedCardsString) {
+          const cards = JSON.parse(savedCardsString);
+          const updatedCards = cards.map((card: any) => {
+            if (card.id === id) {
+              return { ...card, isPublic: true };
+            }
+            return card;
+          });
+          localStorage.setItem("skilltracker_cards", JSON.stringify(updatedCards));
+        }
+
+        setShowPublishModal(false);
+        setPublicPassword("");
+        setShowSuccess(true);
+        setIsPublished(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      } else {
+        console.error("Failed to publish");
+      }
+    } catch (error) {
+      console.error("Error publishing note:", error);
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/public-note/${id}`;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        setShowShared(true);
+        setTimeout(() => setShowShared(false), 2000);
+      }
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
   };
 
   return (
@@ -431,7 +536,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
             </button>
           </div>
         )}
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2">
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 flex gap-4">
           <button
             onClick={saveToLocalStorage}
             disabled={isLoading}
@@ -448,8 +553,184 @@ export default function NoteViewer({ id }: NoteViewerProps) {
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             {isLoading ? "Saving..." : showSuccess ? "SAVED!" : "SAVE"}
           </button>
+          
+          {isCheckingStatus ? (
+            <button
+              disabled
+              className={classnames(
+                "px-3 py-1 md:px-5 md:py-2 rounded-full font-bold uppercase transition-all flex items-center gap-2",
+                "bg-(--text-color)/50 text-(--background-color) border-2 border-(--text-color)/50",
+                "shadow-[6px_6px_0px_0px_rgba(0,0,0,0.1)]",
+                {
+                  "shadow-[6px_6px_0px_0px_rgba(255,255,255,0.1)]":
+                    theme === "black",
+                },
+              )}
+            >
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Checking...
+            </button>
+          ) : isPublished ? (
+            <button
+              onClick={handleShare}
+              className={classnames(
+                "px-3 py-1 md:px-5 md:py-2 rounded-full font-bold uppercase transition-all flex items-center gap-2",
+                "bg-(--text-color) text-(--background-color) border-2 border-(--text-color) cursor-pointer",
+                "shadow-[6px_6px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-none hover:translate-x-1 hover:translate-y-1",
+                {
+                  "shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)]":
+                    theme === "black",
+                },
+              )}
+            >
+              {showShared ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  COPIED!
+                </>
+              ) : (
+                <>
+                  <Share2 className="h-4 w-4" />
+                  SHARE
+                </>
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowPublishModal(true)}
+              disabled={isPublishing}
+              className={classnames(
+                "px-3 py-1 md:px-5 md:py-2 rounded-full font-bold uppercase transition-all flex items-center gap-2",
+                "bg-(--text-color) text-(--background-color) border-2 border-(--text-color) cursor-pointer",
+                "shadow-[6px_6px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-none hover:translate-x-1 hover:translate-y-1",
+                {
+                  "shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)]":
+                    theme === "black",
+                },
+              )}
+            >
+              {isPublishing && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isPublishing ? "PUBLISHING..." : showSuccess && "PUBLISHED!"}
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Publish Modal */}
+      {showPublishModal && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowPublishModal(false)}
+          />
+          
+          <div className="relative bg-(--background-color) text-(--text-color) border-4 border-(--text-color) rounded-2xl md:rounded-3xl p-6 w-full max-w-md shadow-[12px_12px_0_0_rgba(0,0,0,0.2)] animate-in fade-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setShowPublishModal(false)}
+              className="absolute top-4 right-4 p-1 hover:bg-(--text-color)/10 rounded-full transition-colors cursor-pointer"
+            >
+              <X size={20} />
+            </button>
+            
+            <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              <Lock className="text-(--text-color)" />
+              Make Note Public
+            </h2>
+            
+            <p className="mb-4 opacity-80 text-sm">
+              Protect your public note with a password. Share these credentials with others to grant them access.
+            </p>
+            
+            <div className="space-y-2">
+              <div>
+                <label className="block text-sm font-bold mb-1 ml-1">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50" size={18} />
+                  <input 
+                    type="email" 
+                    disabled 
+                    value={session?.user?.email || ""} 
+                    className="w-full bg-(--text-color)/5 border-2 border-(--text-color)/20 rounded-xl py-2 pl-10 pr-4 opacity-70 cursor-not-allowed font-medium"
+                  />
+                </div>
+                <p className="text-xs mt-1 ml-1 opacity-60">Your email will be visible to users.</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-bold mb-1 ml-1">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50" size={18} />
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="Enter a secure password"
+                    value={publicPassword}
+                    onChange={(e) => setPublicPassword(e.target.value)}
+                    className="w-full bg-transparent border-2 border-(--text-color) rounded-xl py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-(--text-color)/50 transition-all font-medium"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                
+                <div className="mt-3 space-y-1.5 p-3 bg-(--text-color)/2 rounded-xl border border-(--text-color)/10">
+                  <p className="text-xs font-bold opacity-70 mb-2 uppercase tracking-wider">Password Requirements:</p>
+                  {passwordRules.map((rule, idx) => {
+                    const isValid = rule.test(publicPassword);
+                    return (
+                      <div key={idx} className="flex items-center gap-1 text-sm">
+                        {isValid ? (
+                          <CheckCircle2 size={16} className="text-black" />
+                        ) : (
+                          <Circle size={16} className="opacity-30" />
+                        )}
+                        <span className={classnames(
+                          "transition-colors duration-200 leading-1 ",
+                          isValid ? "opacity-100" : "opacity-50"
+                        )}>
+                          {rule.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 mt-4 ml-1">
+                <input 
+                  type="checkbox" 
+                  id="bookViewCheck" 
+                  checked={publishInBookView}
+                  onChange={(e) => setPublishInBookView(e.target.checked)}
+                  className="w-4 h-4 -(--text-color) cursor-pointer"
+                />
+                <label htmlFor="bookViewCheck" className="text-sm font-bold cursor-pointer">
+                  Publish in Book View mode
+                </label>
+              </div>
+            </div>
+            
+            <button 
+              onClick={makeNotePublic}
+              disabled={!isPasswordValid || isPublishing}
+              className="mt-8 w-full bg-(--text-color) text-(--background-color) border-2 border-(--text-color) py-3 rounded-xl font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1 hover:shadow-[4px_4px_0_0_rgba(0,0,0,0.2)] transition-all flex justify-center items-center gap-2 cursor-pointer"
+            >
+              {isPublishing ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} />
+                  Publishing...
+                </>
+              ) : (
+                "Confirm & Publish"
+              )}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
