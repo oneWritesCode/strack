@@ -24,6 +24,12 @@ type TaskType = {
   completed: boolean;
   createdAt: string;
 };
+type EventsType = {
+  start: Date;
+  endDate: Date;
+  eventName: String;
+  type: string;
+};
 type SkillsFromBackendType = {
   id: string;
   skillName: string;
@@ -38,7 +44,7 @@ const DashboardComp = () => {
   const [selectedDay, setSelectedDay] = useState<number | null>(
     new Date().getDate(),
   );
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventsType[]>([]);
   const [skills, setSkills] = useState<setSkillsType[]>([]);
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,11 +62,11 @@ const DashboardComp = () => {
       try {
         setLoading(true);
         // Fetch Calendar Events
-        const resEvents = await fetch("/api/calendar/events");
-        if (resEvents.ok) {
-          const data = await resEvents.json();
-          setEvents(data);
-        }
+        // const resEvents = await fetch("/api/calendar/events");
+        // if (resEvents.ok) {
+        //   const data = await resEvents.json();
+        //   setEvents(data);
+        // }
 
         // Fetch Skills and Tasks
         const resSkills = await fetch("/api/skills");
@@ -195,16 +201,16 @@ const DashboardComp = () => {
 
   const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-  const filteredEvents = selectedDay
-    ? events.filter((e: any) => {
-        const eventDate = new Date(e.start);
-        return (
-          eventDate.getDate() === selectedDay &&
-          eventDate.getMonth() === month &&
-          eventDate.getFullYear() === year
-        );
-      })
-    : events.filter((e: any) => new Date(e.start) >= new Date()).slice(0, 5);
+  // const filteredEvents = selectedDay
+  //   ? events.filter((e: any) => {
+  //       const eventDate = new Date(e.start);
+  //       return (
+  //         eventDate.getDate() === selectedDay &&
+  //         eventDate.getMonth() === month &&
+  //         eventDate.getFullYear() === year
+  //       );
+  //     })
+  //   : events.filter((e: any) => new Date(e.start) >= new Date()).slice(0, 5);
 
   const taskCounts = tasks.reduce((acc: Record<string, number>, task) => {
     acc[task.title] = (acc[task.title] || 0) + 1;
