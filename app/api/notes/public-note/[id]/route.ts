@@ -41,9 +41,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { contentJSON, contentHTML, content, password } = await req.json();
 
     const note = await prisma.note.findUnique({
