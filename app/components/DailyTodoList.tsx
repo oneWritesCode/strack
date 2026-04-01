@@ -205,7 +205,6 @@ export default function DailyTodoList() {
           <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
             <form onSubmit={addTask} className="flex items-center gap-1 md:gap-2 mt-2 w-full">
               <input
-                autoFocus
                 type="text"
                 placeholder="Add todo..."
                 value={newTask}
