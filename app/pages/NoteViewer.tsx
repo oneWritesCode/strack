@@ -8,7 +8,22 @@ import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
 import { FontSize } from "@/app/extensions/FontSize";
 import Image from "@tiptap/extension-image";
-import { Redo, Undo, Loader2, ArrowLeft, BookOpen, X, Lock, Mail, CheckCircle2, Circle, Eye, EyeOff, Share2, Check } from "lucide-react";
+import {
+  Redo,
+  Undo,
+  Loader2,
+  ArrowLeft,
+  BookOpen,
+  X,
+  Lock,
+  Mail,
+  CheckCircle2,
+  Circle,
+  Eye,
+  EyeOff,
+  Share2,
+  Check,
+} from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import classnames from "classnames";
@@ -46,13 +61,24 @@ export default function NoteViewer({ id }: NoteViewerProps) {
 
   const passwordRules = [
     { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
-    { label: "At least 1 uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
-    { label: "At least 1 lowercase letter", test: (p: string) => /[a-z]/.test(p) },
+    {
+      label: "At least 1 uppercase letter",
+      test: (p: string) => /[A-Z]/.test(p),
+    },
+    {
+      label: "At least 1 lowercase letter",
+      test: (p: string) => /[a-z]/.test(p),
+    },
     { label: "At least 1 number", test: (p: string) => /[0-9]/.test(p) },
-    { label: "At least 1 special character", test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+    {
+      label: "At least 1 special character",
+      test: (p: string) => /[^A-Za-z0-9]/.test(p),
+    },
   ];
-  
-  const isPasswordValid = passwordRules.every(rule => rule.test(publicPassword));
+
+  const isPasswordValid = passwordRules.every((rule) =>
+    rule.test(publicPassword),
+  );
 
   const storageKey = `extra_card_${id}`;
   const bookViewKey = `bookview_${id}`;
@@ -195,6 +221,24 @@ export default function NoteViewer({ id }: NoteViewerProps) {
     [pageWidth],
   );
 
+  // moving pages on pressing arrow keys
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // onClick={() => goToPage(currentPage - 1)}
+      if (event.key === "ArrowLeft") {
+        goToPage(currentPage - 1);
+      } else if (event.key === "ArrowRight") {
+        goToPage(currentPage + 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentPage, goToPage]);
+
   const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current || !pageWidth) return;
     const sl = scrollContainerRef.current.scrollLeft;
@@ -238,8 +282,8 @@ export default function NoteViewer({ id }: NoteViewerProps) {
 
     // Sync from DB to ensure isPublished status is fresh
     fetch(`/api/notes/public-note/${id}`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data && data.note) {
           if (data.note.isPublic) {
             setIsPublished(true);
@@ -251,7 +295,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
         }
         setIsCheckingStatus(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Error syncing note info:", err);
         setIsCheckingStatus(false);
       });
@@ -345,7 +389,10 @@ export default function NoteViewer({ id }: NoteViewerProps) {
             }
             return card;
           });
-          localStorage.setItem("skilltracker_cards", JSON.stringify(updatedCards));
+          localStorage.setItem(
+            "skilltracker_cards",
+            JSON.stringify(updatedCards),
+          );
         }
 
         setShowPublishModal(false);
@@ -453,7 +500,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
                 >
                   <BookOpen size={18} /> book mode
                 </button>
-                
+
                 <button
                   onClick={deleteCard}
                   className="w-full flex items-center gap-3 pl-2 p-1 text-xs md:text-base hover:bg-[#D73535] hover:text-white transition-colors text-(--text-color)"
@@ -518,6 +565,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
             />
           </div>
         </div>
+
         {isBookView && (
           <div className="flex justify-between items-center py-2 px-3 mb-2 mt-4">
             <button
@@ -553,7 +601,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             {isLoading ? "Saving..." : showSuccess ? "SAVED!" : "SAVE"}
           </button>
-          
+
           {isCheckingStatus ? (
             <button
               disabled
@@ -585,12 +633,12 @@ export default function NoteViewer({ id }: NoteViewerProps) {
             >
               {showShared ? (
                 <>
-                  <Check className="h-4 w-4" />
+                  <Check className="text-(--background-color)" />
                   COPIED!
                 </>
               ) : (
                 <>
-                  <Share2 className="h-4 w-4" />
+                  <Share2 className="text-(--background-color)" />
                   SHARE
                 </>
               )}
@@ -619,49 +667,62 @@ export default function NoteViewer({ id }: NoteViewerProps) {
       {/* Publish Modal */}
       {showPublishModal && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
-          <div 
+          <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={() => setShowPublishModal(false)}
           />
-          
+
           <div className="relative bg-(--background-color) text-(--text-color) border-4 border-(--text-color) rounded-2xl md:rounded-3xl p-6 w-full max-w-md shadow-[12px_12px_0_0_rgba(0,0,0,0.2)] animate-in fade-in zoom-in-95 duration-200">
-            <button 
+            <button
               onClick={() => setShowPublishModal(false)}
               className="absolute top-4 right-4 p-1 hover:bg-(--text-color)/10 rounded-full transition-colors cursor-pointer"
             >
               <X size={20} />
             </button>
-            
+
             <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
               <Lock className="text-(--text-color)" />
               Make Note Public
             </h2>
-            
+
             <p className="mb-4 opacity-80 text-sm">
-              Protect your public note with a password. Share these credentials with others to grant them access.
+              Protect your public note with a password. Share these credentials
+              with others to grant them access.
             </p>
-            
+
             <div className="space-y-2">
               <div>
-                <label className="block text-sm font-bold mb-1 ml-1">Email</label>
+                <label className="block text-sm font-bold mb-1 ml-1">
+                  Email
+                </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50" size={18} />
-                  <input 
-                    type="email" 
-                    disabled 
-                    value={session?.user?.email || ""} 
+                  <Mail
+                    className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50"
+                    size={18}
+                  />
+                  <input
+                    type="email"
+                    disabled
+                    value={session?.user?.email || ""}
                     className="w-full bg-(--text-color)/5 border-2 border-(--text-color)/20 rounded-xl py-2 pl-10 pr-4 opacity-70 cursor-not-allowed font-medium"
                   />
                 </div>
-                <p className="text-xs mt-1 ml-1 opacity-60">Your email will be visible to users.</p>
+                <p className="text-xs mt-1 ml-1 opacity-60">
+                  Your email will be visible to users.
+                </p>
               </div>
-              
+
               <div>
-                <label className="block text-sm font-bold mb-1 ml-1">Password</label>
+                <label className="block text-sm font-bold mb-1 ml-1">
+                  Password
+                </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50" size={18} />
-                  <input 
-                    type={showPassword ? "text" : "password"} 
+                  <Lock
+                    className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50"
+                    size={18}
+                  />
+                  <input
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter a secure password"
                     value={publicPassword}
                     onChange={(e) => setPublicPassword(e.target.value)}
@@ -676,22 +737,29 @@ export default function NoteViewer({ id }: NoteViewerProps) {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
-                
+
                 <div className="mt-3 space-y-1.5 p-3 bg-(--text-color)/2 rounded-xl border border-(--text-color)/10">
-                  <p className="text-xs font-bold opacity-70 mb-2 uppercase tracking-wider">Password Requirements:</p>
+                  <p className="text-xs font-bold opacity-70 mb-2 uppercase tracking-wider">
+                    Password Requirements:
+                  </p>
                   {passwordRules.map((rule, idx) => {
                     const isValid = rule.test(publicPassword);
                     return (
-                      <div key={idx} className="flex items-center gap-1 text-sm">
+                      <div
+                        key={idx}
+                        className="flex items-center gap-1 text-sm"
+                      >
                         {isValid ? (
                           <CheckCircle2 size={16} className="text-black" />
                         ) : (
                           <Circle size={16} className="opacity-30" />
                         )}
-                        <span className={classnames(
-                          "transition-colors duration-200 leading-1 ",
-                          isValid ? "opacity-100" : "opacity-50"
-                        )}>
+                        <span
+                          className={classnames(
+                            "transition-colors duration-200 leading-1 ",
+                            isValid ? "opacity-100" : "opacity-50",
+                          )}
+                        >
                           {rule.label}
                         </span>
                       </div>
@@ -699,22 +767,25 @@ export default function NoteViewer({ id }: NoteViewerProps) {
                   })}
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2 mt-4 ml-1">
-                <input 
-                  type="checkbox" 
-                  id="bookViewCheck" 
+                <input
+                  type="checkbox"
+                  id="bookViewCheck"
                   checked={publishInBookView}
                   onChange={(e) => setPublishInBookView(e.target.checked)}
                   className="w-4 h-4 -(--text-color) cursor-pointer"
                 />
-                <label htmlFor="bookViewCheck" className="text-sm font-bold cursor-pointer">
+                <label
+                  htmlFor="bookViewCheck"
+                  className="text-sm font-bold cursor-pointer"
+                >
                   Publish in Book View mode
                 </label>
               </div>
             </div>
-            
-            <button 
+
+            <button
               onClick={makeNotePublic}
               disabled={!isPasswordValid || isPublishing}
               className="mt-8 w-full bg-(--text-color) text-(--background-color) border-2 border-(--text-color) py-3 rounded-xl font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1 hover:shadow-[4px_4px_0_0_rgba(0,0,0,0.2)] transition-all flex justify-center items-center gap-2 cursor-pointer"
