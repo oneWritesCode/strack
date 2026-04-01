@@ -6,13 +6,7 @@ import { FaCalendar } from "react-icons/fa";
 import Cookies from "js-cookie";
 import Navbar from "../components/Navbar";
 import DailyTodoList from "../components/DailyTodoList";
-import {
-  Search,
-  LayoutGrid,
-  List,
-  LayoutPanelLeft,
-  Star,
-} from "lucide-react";
+import { Search, LayoutGrid, List, LayoutPanelLeft, Star } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "../context/ThemeContext";
 import classnames from "classnames";
@@ -63,8 +57,8 @@ const NoteCard = ({
         <Star
           // size={isList ? 20 : 24}
           className={classnames("transition-all text-black", {
-            "text-4xl":isList ,
-            "text-2xl":!isList ,
+            "text-4xl": isList,
+            "text-2xl": !isList,
             "fill-yellow-400 text-black drop-shadow-sm": card.isStarred,
           })}
         />
@@ -255,7 +249,7 @@ function Home() {
     }
 
     // 1. Check for special characters (allow only alphanumeric and spaces)
-    if (/[^a-zA-Z0-9\s]/.test(trimmedTitle)) {
+    if (/[^a-zA-Z0-9_<>-\s]/.test(trimmedTitle)) {
       setShowErrorWhileAddingCard("Title cannot contain special characters!");
       return;
     }
@@ -272,7 +266,15 @@ function Home() {
 
     setIsAdding(false);
 
-    const newCardId = trimmedTitle.toLowerCase().replace(/\s+/g, "-");
+    function generateId() {
+      const timestamp = Date.now().toString(36); // compact time
+      const randomPart = Math.random().toString(36).substring(2, 10); // 8 random chars
+      const extraRandom = Math.floor(Math.random() * 1e8).toString(36); // more entropy
+
+      return `${timestamp}-${randomPart}-${extraRandom}`;
+    }
+
+    const newCardId = generateId();
     const newCard: Card = {
       id: newCardId,
       title: trimmedTitle,
@@ -385,9 +387,7 @@ function Home() {
           <h1 className="text-3xl md:text-6xl font-medium text-(--text-color)">
             Hi {session?.user?.name || optimisticName || "there"},
           </h1>
-          <p className="max-w-lg text-(--text-color)/80">
-            how's your day?
-          </p>
+          <p className="max-w-lg text-(--text-color)/80">how's your day?</p>
         </div>
 
         <div className="flex gap-4 relative w-full">
