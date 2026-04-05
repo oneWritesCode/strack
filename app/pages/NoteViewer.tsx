@@ -132,10 +132,8 @@ export default function NoteViewer({ id }: NoteViewerProps) {
   }, []);
 
   const defaultContent = `
-       <strong>Write about ${id} here</strong>
-       <br />
-       <br />
-       - Start Writing <br /> <br />  <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
+       <strong>start writing from here</strong>
+       <br /><br /> <br />  <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
     `;
 
   const editor: any = useEditor({
@@ -658,7 +656,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
               )}
             >
               {isPublishing && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isPublishing ? "PUBLISHING..." : showSuccess && "PUBLISHED!"}
+              {isPublishing ? "PUBLISHING..." : showSuccess ? "PUBLISHED!" : "PUBLISH"}
             </button>
           )}
         </div>
