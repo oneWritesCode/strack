@@ -107,6 +107,8 @@ export default function NoteViewer({ id }: NoteViewerProps) {
       const cards = JSON.parse(savedCards);
       const updatedCards = cards.filter((card: any) => card.id !== id);
       localStorage.setItem("skilltracker_cards", JSON.stringify(updatedCards));
+    localStorage.setItem("isLocallySynced", JSON.stringify(true));
+
     }
     localStorage.removeItem(storageKey);
     localStorage.removeItem(bookViewKey);
@@ -348,6 +350,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
         return card;
       });
       localStorage.setItem("skilltracker_cards", JSON.stringify(updatedCards));
+      localStorage.setItem("isLocallySynced", JSON.stringify(true));
     }
 
     setTimeout(() => {
@@ -656,7 +659,11 @@ export default function NoteViewer({ id }: NoteViewerProps) {
               )}
             >
               {isPublishing && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isPublishing ? "PUBLISHING..." : showSuccess ? "PUBLISHED!" : "PUBLISH"}
+              {isPublishing
+                ? "PUBLISHING..."
+                : showSuccess
+                  ? "PUBLISHED!"
+                  : "PUBLISH"}
             </button>
           )}
         </div>

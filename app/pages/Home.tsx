@@ -236,6 +236,7 @@ function Home() {
   const saveCards = (updatedCards: Card[]) => {
     setCards(updatedCards);
     localStorage.setItem("skilltracker_cards", JSON.stringify(updatedCards));
+    localStorage.setItem("isLocallySynced", JSON.stringify(true));
   };
 
   const addCard = async (e: React.FormEvent) => {

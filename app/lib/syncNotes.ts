@@ -1,9 +1,12 @@
 export async function syncNotesWithDatabase() {
+  const isLocallySynced = localStorage.getItem("isLocallySynced");
+  if (isLocallySynced === null) {
+    localStorage.setItem("isLocallySynced", "false");
+  }
   try {
-    const isSynced = localStorage.getItem("isSynced");
-
-    if (isSynced === "true") {
-      // isSynced is true — push all local notes to the DB
+    console.log("isLocallySynced :: ", isLocallySynced);
+    if (isLocallySynced === "true") {
+      // isLocallySynced is true — push all local notes to the DB
       const localCardsStr = localStorage.getItem("skilltracker_cards");
       const localCards = localCardsStr ? JSON.parse(localCardsStr) : [];
 
@@ -40,7 +43,7 @@ export async function syncNotesWithDatabase() {
       return;
     }
 
-    // isSynced is not true — keep the existing flow
+    // isLocallySynced is not true — keep the existing flow
     // 1. Fetch the notes from the database
     const res = await fetch("/api/notes");
     if (!res.ok) {
@@ -130,4 +133,3 @@ export async function syncNotesWithDatabase() {
     console.error("Error syncing notes:", error);
   }
 }
-
