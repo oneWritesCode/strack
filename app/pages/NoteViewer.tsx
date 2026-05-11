@@ -107,8 +107,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
       const cards = JSON.parse(savedCards);
       const updatedCards = cards.filter((card: any) => card.id !== id);
       localStorage.setItem("skilltracker_cards", JSON.stringify(updatedCards));
-    localStorage.setItem("isLocallySynced", JSON.stringify(true));
-
+      localStorage.setItem("isLocallySynced", JSON.stringify(true));
     }
     localStorage.removeItem(storageKey);
     localStorage.removeItem(bookViewKey);
@@ -172,6 +171,7 @@ export default function NoteViewer({ id }: NoteViewerProps) {
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       setLastUpdateTrigger(Date.now());
+      localStorage.setItem("isLocallySynced", "false");
     },
   });
 
